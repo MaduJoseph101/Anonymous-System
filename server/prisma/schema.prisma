@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ANONYMITY GUARANTEE: The Report model intentionally contains NO field that
+// could store a student name, student ID, email, phone number, or IP address.
+// This is an architectural guarantee, not a policy. Any migration that attempts
+// to add such a field must be rejected.
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Report {
+  id                     String         @id @default(uuid())
+  tracking_code          String         @unique
+  retraction_code_hash   String?        @unique
+  category               String
+  // Encrypted at the application layer before storage (AES-256)
+  description            String
+  location               String
+  location_description   String?
+  uncertainty_statement  String?
+  reporter_context       String?
+  time_of_day            String?
+  status                 ReportStatus   @default(RECEIVED)
+  priority               Priority       @default(NORMAL)
+  assigned_to            String?
+  is_in_escrow           Boolean        @default(false)
+  escrow_release_at      DateTime?
+  is_student_verified    Boolean        @default(false)
+  verification_method    String?
+  // AI credibility signals — all derived, never PII
+  ai_credibility_score   Int?
+  ai_credibility_tier    String?
+  ai_assessment_json     String?
+  ai_analysis_status     String         @default("PENDING")
+  ai_assessed_at         DateTime?
+  composite_score        Int?
+  composite_tier         String?
+  structural_score       Int?
+  structural_tier        String?
+  statistical_flags_json String?
+  similarity_flags_json  String?
+  // Reputation of the anonymous channel (RTC), not of any person
+  rtc_reputation_score   Int            @default(0)
+  outcome                ReportOutcome?
+  corroboration_note     String?
+  messages               Message[]
+  evidence               Evidence[]
+  audit_logs             AuditLog[]
+  created_at             DateTime       @default(now())
+  updated_at             DateTime       @updatedAt
+  resolved_at            DateTime?
+}
+
+enum ReportStatus {
+  RECEIVED
+  ESCROW
+  UNDER_REVIEW
+  INVESTIGATING
+  ACTION_TAKEN
+  RESOLVED
+  CLOSED
+  RETRACTED_BY_REPORTER
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum ReportOutcome {
+  CORROBORATED
+  UNSUBSTANTIATED
+  FALSE
+  PENDING
+}
+
+model Message {
+  id          String     @id @default(uuid())
+  report_id   String
+  report      Report     @relation(fields: [report_id], references: [id])
+  sender_type SenderType
+  // Encrypted at application layer
+  content     String
+  is_read     Boolean    @default(false)
+  created_at  DateTime   @default(now())
+}
+
+enum SenderType {
+  REPORTER
+  ADMIN
+}
+
+model Evidence {
+  id         String   @id @default(uuid())
+  report_id  String
+  report     Report   @relation(fields: [report_id], references: [id])
+  file_path  String
+  file_type  String
+  file_size  Int
+  created_at DateTime @default(now())
+}
+
+model AdminUser {
+  id         String     @id @default(uuid())
+  email      String     @unique
+  password   String
+  full_name  String
+  role       AdminRole
+  is_active  Boolean    @default(true)
+  last_login DateTime?
+  audit_logs AuditLog[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  WELFARE_OFFICER
+  SECURITY_OFFICER
+  FACILITY_MANAGER
+  ACADEMIC_AFFAIRS
+  COUNSELLOR
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AuditLog is APPEND-ONLY. No UPDATE or DELETE operations should ever be
+// executed against this table anywhere in the codebase.
+// ─────────────────────────────────────────────────────────────────────────────
+model AuditLog {
+  id         String     @id @default(uuid())
+  report_id  String?
+  report     Report?    @relation(fields: [report_id], references: [id])
+  admin_id   String?
+  admin      AdminUser? @relation(fields: [admin_id], references: [id])
+  action     String
+  details    String?
+  created_at DateTime   @default(now())
+}
+
+// Tracks the reputation of an anonymous Reporting Tracking Channel (RTC).
+// The hash is derived from the device fingerprint. No raw fingerprint is stored.
+model RTCRegistry {
+  id                  String   @id @default(uuid())
+  tracking_code_hash  String   @unique
+  reputation_score    Int      @default(0)
+  total_reports       Int      @default(0)
+  last_updated        DateTime @default(now())
+}
+
+// Short-lived OTP verification tokens. Email is stored as a hash only.
+model VerificationToken {
+  id         String    @id @default(uuid())
+  token_hash String    @unique
+  email_hash String
+  expires_at DateTime
+  is_used    Boolean   @default(false)
+  used_at    DateTime?
+  created_at DateTime  @default(now())
+}
+
+// Pending OTP records. email_hash ensures no plaintext email is persisted.
+model PendingOTP {
+  id         String   @id @default(uuid())
+  email_hash String
+  otp_hash   String
+  expires_at DateTime
+  is_used    Boolean  @default(false)
+  created_at DateTime @default(now())
+}
