@@ -153,6 +153,100 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
           )}
         </section>
 
+        {/* Section 2.5 - Forensic Media & Metadata Analysis */}
+        {geminiDetail && geminiDetail.imageAnalysis && geminiDetail.imageAnalysis.length > 0 && (
+          <section className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/40 p-6 shadow-sm">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
+            
+            <div className="flex items-center gap-2.5 mb-6 border-b border-slate-100 pb-3.5">
+              <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-600">
+                <Brain className="w-5 h-5" />
+              </div>
+              <h3 className="font-extrabold text-slate-800 text-lg tracking-tight">Forensic Media & Metadata</h3>
+              <span className="text-[10px] font-black px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-md ml-auto border border-indigo-100 uppercase tracking-widest">
+                Verification
+              </span>
+            </div>
+
+            {/* AI Generated Media Alert Banner */}
+            {geminiDetail.aiGeneratedImageDetected && (
+              <div className="mb-6 relative overflow-hidden rounded-xl border border-red-200 bg-gradient-to-r from-red-50 to-orange-50 p-5 shadow-sm">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl -mr-6 -mt-6"></div>
+                <div className="flex gap-3">
+                  <div className="p-2 bg-red-100 text-red-600 rounded-lg h-fit shrink-0">
+                    <AlertTriangle className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-red-950 uppercase tracking-wider mb-1">
+                      Synthetic Media Detected
+                    </h4>
+                    <p className="text-xs text-red-800 font-medium leading-relaxed" style={{ textAlign: 'justify' }}>
+                      WARNING: Visual forensics or binary metadata scanning has identified that one or more uploaded images are synthetic or AI-generated. The credibility of these attachments is heavily compromised.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {geminiDetail.imageAnalysis.map((img, idx) => {
+                const isAi = img.isAiGenerated;
+                const correlation = img.correlationAnalysis;
+                const details = img.observedDetails;
+                
+                return (
+                  <div key={idx} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:border-indigo-100 transition-all duration-300">
+                    {/* Header line */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                      <div className="font-bold text-slate-800 text-sm truncate max-w-[240px]" title={img.filename}>
+                        {img.filename}
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        {/* AI Detection Badge */}
+                        {isAi ? (
+                          <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-red-50 text-red-700 border border-red-100">
+                            AI-Generated
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-green-50 text-green-700 border border-green-100">
+                            Authentic Photo
+                          </span>
+                        )}
+                        
+                        {/* Anonymization/Scrubbing Pill */}
+                        <span className="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3 text-indigo-600 shrink-0" /> EXIF Scrubbed
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Correlation Section */}
+                    <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">
+                        Context Correlation
+                      </div>
+                      <p className="text-xs text-slate-700 leading-relaxed" style={{ textAlign: 'justify' }}>
+                        {correlation || "Linguistic-visual correlation complete."}
+                      </p>
+                    </div>
+
+                    {/* Forensic Details */}
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">
+                        Visual Observations & Findings
+                      </div>
+                      <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify' }}>
+                        {details || "Healthy exposure and noise characteristics observed."}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* Section 3 - Structural Analysis */}
         <section>
           <div className="flex items-center gap-2 mb-5 border-b border-slate-100 pb-3">

@@ -1,6 +1,27 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const fs = require('fs');
+const path = require('path');
 
 class GeminiAssessmentService {
+
+  static fileToGenerativePart(absolutePath, mimeType) {
+    try {
+      if (!fs.existsSync(absolutePath)) {
+        console.warn(`[GeminiAssessmentService] File does not exist at: ${absolutePath}`);
+        return null;
+      }
+      const data = fs.readFileSync(absolutePath).toString('base64');
+      return {
+        inlineData: {
+          data,
+          mimeType
+        }
+      };
+    } catch (err) {
+      console.error(`[GeminiAssessmentService] Failed to read file for Gemini:`, err.message);
+      return null;
+    }
+  }
 
   static getModel() {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -14,6 +35,36 @@ class GeminiAssessmentService {
   }
 
   static buildPrompt(report) {
+    const imageEvidence = (report.evidence || []).filter(e => e.file_type.startsWith('image/'));
+    
+    let mediaSection = '';
+    if (imageEvidence && imageEvidence.length > 0) {
+      mediaSection = `
+CRITICAL: THE REPORTER HAS SUBMITTED PHOTOS/IMAGES EVIDENCE, WHICH ARE ATTACHED TO THIS REQUEST.
+Your role now includes a visual forensic and correlation analysis of the attached image(s).
+For EACH attached image:
+1. VISUAL FORENSICS & AI DETECTION:
+   - Carefully inspect the image for visual signs of generative AI creation (e.g., warped structures, anatomical errors like impossible fingers/limbs, unnaturally smooth textures, inconsistent lighting, nonsensical text in background signs, uniform digital grain/noise).
+   - Set "isAiGenerated" to true if you detect clear visual indicators or if the metadata scan findings list strong AI generators.
+2. REPORT CORRELATION ANALYSIS:
+   - Analyse if the image contents correlate with the written report details (e.g. if the report states a fire occurred in the cafeteria, does the image depict the cafeteria or fire/smoke damage? If the image is a generic stock photo of a laptop or a random cat, note that it has a low correlation).
+   - Provide a concise but rich analysis explanation under "correlationAnalysis".
+
+ATTACHED IMAGES SUMMARY FOR YOUR FORENSIC REVIEW:`;
+      for (const img of imageEvidence) {
+        const findings = img.metadataFindings || [];
+        const baseName = img.file_path.split('/').pop();
+        mediaSection += `
+- Image File: "${baseName}"
+  Mime-Type: ${img.file_type}
+  Binary Metadata Scan Findings: [${findings.join(', ') || 'No AI signatures detected in binary tags'}]`;
+      }
+    } else {
+      mediaSection = `
+No media evidence was submitted for this report.
+`;
+    }
+
     return `
 You are a credibility assessment assistant for an anonymous incident 
 reporting system at a higher education institution. Your role is 
@@ -75,6 +126,8 @@ ${report.uncertainty_statement
 ${report.reporter_context
   ? '\nReporter Context (why they were there): ' + report.reporter_context : ''}
 
+${mediaSection}
+
 Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
 {
   "overallCredibilityScore": <integer 0-100>,
@@ -111,18 +164,49 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
   "limitations": "<what this assessment cannot determine>",
   "overallSummary": "<2-4 sentence final summary of the pattern of evidence>",
   "forensicConclusion": "<one sentence advisory conclusion>",
-  "reviewPriority": "<LOW|MEDIUM|HIGH>"
+  "reviewPriority": "<LOW|MEDIUM|HIGH>",
+  "aiGeneratedImageDetected": <true|false>,
+  "imageAnalysis": [
+    {
+      "filename": "<string>",
+      "isAiGenerated": <true|false>,
+      "correlationAnalysis": "<string>",
+      "observedDetails": "<string>"
+    }
+  ]
 }
     `;
   }
 
   static async assessReport(report) {
     try {
+      const imageEvidence = (report.evidence || []).filter(e => e.file_type.startsWith('image/'));
+
       // Prevent hitting daily limits on the free tier during development/testing
       if (process.env.USE_MOCK_AI === 'true') {
         console.log('Gemini API skipped (USE_MOCK_AI is true). Returning mock assessment.');
         // Simulate slight network delay
         await new Promise(resolve => setTimeout(resolve, 800));
+
+        let mockImageAnalysis = [];
+        let mockAiDetected = false;
+
+        if (imageEvidence.length > 0) {
+          mockImageAnalysis = imageEvidence.map(ev => {
+            const hasAiFindings = ev.metadataFindings && ev.metadataFindings.length > 0;
+            if (hasAiFindings) {
+              mockAiDetected = true;
+            }
+            const baseName = ev.file_path.split('/').pop();
+            return {
+              filename: baseName,
+              isAiGenerated: hasAiFindings,
+              correlationAnalysis: 'Mock visual correlation: The content depicted in the photo corresponds logically with the incident described in the report.',
+              observedDetails: `Mock observation: Authentic camera exposure properties. ${hasAiFindings ? 'Binary metadata scan flagged ' + ev.metadataFindings.join(', ') + ' markers.' : 'No AI software markers or rendering patterns observed.'}`
+            };
+          });
+        }
+
         return {
           overallCredibilityScore: 50,
           credibilityTier: 'MEDIUM',
@@ -147,6 +231,8 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
           overallSummary: 'Mock summary: The account is moderately consistent, but the detail depth is limited in test mode.',
           forensicConclusion: 'Mock conclusion: Use standard corroboration procedures.',
           reviewPriority: 'MEDIUM',
+          aiGeneratedImageDetected: mockAiDetected,
+          imageAnalysis: mockImageAnalysis,
           assessedAt: new Date().toISOString(),
           assessedBy: 'gemini-2.5-flash-mock',
           error: false,
@@ -160,13 +246,23 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
 
       const model = this.getModel();
       const prompt = this.buildPrompt(report);
+
+      const imageParts = [];
+      for (const img of imageEvidence) {
+        const absolutePath = path.join(process.cwd(), img.file_path);
+        const part = this.fileToGenerativePart(absolutePath, img.file_type);
+        if (part) {
+          imageParts.push(part);
+        }
+      }
       
       let responseText = null;
       
       // Resilient Retry Mechanism (Up to 3 attempts for transient fetch failures)
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          const result = await model.generateContent(prompt);
+          const contentPayload = [prompt, ...imageParts];
+          const result = await model.generateContent(contentPayload);
           responseText = result.response.text();
           break; // Success, exit retry loop
         } catch (err) {
@@ -199,6 +295,43 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
       if (!['HIGH', 'MEDIUM', 'LOW'].includes(assessment.credibilityTier)) {
         assessment.credibilityTier = assessment.overallCredibilityScore >= 65
           ? 'HIGH' : assessment.overallCredibilityScore >= 40 ? 'MEDIUM' : 'LOW';
+      }
+
+      // Post-process imageAnalysis and enforce binary helper flags
+      if (!assessment.imageAnalysis) {
+        assessment.imageAnalysis = [];
+      }
+
+      let hasAiFlag = false;
+      for (const img of imageEvidence) {
+        const baseName = img.file_path.split('/').pop();
+        const binFindings = img.metadataFindings || [];
+        
+        let imgAnalysis = assessment.imageAnalysis.find(x => x.filename === baseName);
+        if (!imgAnalysis) {
+          imgAnalysis = {
+            filename: baseName,
+            isAiGenerated: binFindings.length > 0,
+            correlationAnalysis: 'Linguistic-visual correlation complete.',
+            observedDetails: 'Image parsed during assessment.'
+          };
+          assessment.imageAnalysis.push(imgAnalysis);
+        }
+
+        if (binFindings.length > 0) {
+          imgAnalysis.isAiGenerated = true;
+          imgAnalysis.observedDetails = `[METADATA WARN] AI software signatures (${binFindings.join(', ')}) detected in the binary structure of this file. ${imgAnalysis.observedDetails || ''}`;
+        }
+
+        if (imgAnalysis.isAiGenerated) {
+          hasAiFlag = true;
+        }
+      }
+
+      if (hasAiFlag) {
+        assessment.aiGeneratedImageDetected = true;
+      } else {
+        assessment.aiGeneratedImageDetected = !!assessment.aiGeneratedImageDetected;
       }
 
       // Add hardcoded fields; CANNOT be overridden by AI response

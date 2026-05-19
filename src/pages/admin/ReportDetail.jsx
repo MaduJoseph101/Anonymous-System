@@ -90,12 +90,18 @@ export default function ReportDetail() {
   const compositeTier = report.compositeTier || report.composite_tier;
   const tierInfo = CREDIBILITY_TIER_CONFIG[compositeTier] || CREDIBILITY_TIER_CONFIG.UNAVAILABLE;
   const isVerified = report.isStudentVerified || report.is_student_verified;
-  const mediaItems = [
+  const rawMediaItems = [
     ...(Array.isArray(report.evidence) ? report.evidence : []),
     ...(Array.isArray(report.media) ? report.media : []),
     ...(report.attachment ? [report.attachment] : []),
     ...(report.mediaUrl ? [{ url: report.mediaUrl, mimeType: report.mediaType, filename: report.mediaName }] : [])
   ].filter(Boolean);
+
+  const mediaItems = rawMediaItems.filter((item, index, self) => {
+    const itemUrl = item.url || item.file_path || item.path || item.secureUrl || item.id;
+    if (!itemUrl) return true;
+    return self.findIndex(t => (t.url || t.file_path || t.path || t.secureUrl || t.id) === itemUrl) === index;
+  });
 
   const getMediaUrl = (item) => {
     const candidate = item?.url || item?.fileUrl || item?.path || item?.secureUrl;
@@ -378,7 +384,7 @@ export default function ReportDetail() {
         forensicConclusion={report.forensicConclusion || report.aiAssessment?.forensicConclusion}
         reviewPriority={report.reviewPriority || report.aiAssessment?.reviewPriority}
         signals={report.signals || report.aiAssessment?.signals || []}
-        isLoading={false}
+        isLoading={report.aiAnalysisStatus === 'PENDING'}
       />
 
       <StatusControls 

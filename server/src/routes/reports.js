@@ -13,6 +13,7 @@ const { encrypt, decrypt } = require('../utils/encryption');
 const CompositeCredibilityService = require('../services/CompositeCredibilityService');
 const EscrowService = require('../services/EscrowService');
 const NotificationService = require('../services/NotificationService');
+const MetadataHelper = require('../utils/metadataHelper');
 
 const replaceEmDashes = (str) => {
   if (typeof str !== 'string') return str;
@@ -117,13 +118,25 @@ router.post('/submit',
         }
       });
 
+      let metadataFindings = [];
       if (req.file) {
+        const absolutePath = req.file.path;
+        metadataFindings = MetadataHelper.processAndScrubFile(absolutePath, req.file.mimetype);
+        
+        let finalSize = req.file.size;
+        try {
+          const stats = fs.statSync(absolutePath);
+          finalSize = stats.size;
+        } catch (e) {
+          console.error('[Reports Route] Failed to get stats for scrubbed file:', e.message);
+        }
+
         await prisma.evidence.create({
           data: {
             report_id: report.id,
             file_path: `/uploads/evidence/${req.file.filename}`,
             file_type: req.file.mimetype,
-            file_size: req.file.size
+            file_size: finalSize
           }
         });
       }
@@ -147,6 +160,30 @@ router.post('/submit',
       // ASYNC PROCESSING: runs after response sent to student
       setImmediate(async () => {
         try {
+          // Fetch the evidence details for this report
+          const evidenceList = await prisma.evidence.findMany({
+            where: { report_id: report.id }
+          });
+
+          // Map evidence with the metadata findings computed during submission
+          const mappedEvidence = evidenceList.map(ev => {
+            if (req.file && ev.file_path.includes(req.file.filename)) {
+              return {
+                id: ev.id,
+                report_id: ev.report_id,
+                file_path: ev.file_path,
+                file_type: ev.file_type,
+                file_size: ev.file_size,
+                created_at: ev.created_at,
+                metadataFindings: metadataFindings
+              };
+            }
+            return {
+              ...ev,
+              metadataFindings: []
+            };
+          });
+
           // Plain text for AI analysis (never encrypted for Gemini)
           const reportForAnalysis = {
             id: report.id,
@@ -157,7 +194,8 @@ router.post('/submit',
             uncertainty_statement: sanitizedUncertaintyStatement,
             reporter_context: sanitizedReporterContext,
             time_of_day: timeOfDay,
-            created_at: report.created_at
+            created_at: report.created_at,
+            evidence: mappedEvidence
           };
 
           const composite = await CompositeCredibilityService

@@ -80,6 +80,18 @@ class CompositeCredibilityService {
       compositeScore -= 5; // Minor penalty for suspicious similarity
     }
 
+    // AI Generated Image Penalty: subtract 20 points
+    if (gemini && gemini.aiGeneratedImageDetected) {
+      compositeScore -= 20;
+      signals.push({
+        source: 'Forensic Media Analysis',
+        score: 0,
+        tier: 'LOW',
+        weight: 'Penalty (-20)',
+        summary: 'WARNING: Uploaded media evidence was flagged as synthetic/AI-generated. This heavily impacts report credibility.'
+      });
+    }
+
     compositeScore = Math.max(0, Math.min(100, Math.round(compositeScore)));
 
     const finalTier = compositeScore >= 65 ? 'HIGH'
