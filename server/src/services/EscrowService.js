@@ -149,7 +149,7 @@ class EscrowService {
           await prisma.message.create({
             data: {
               report_id: report.id,
-              sender_type: 'SYSTEM',
+              sender_type: 'ADMIN',
               content: encrypt('System Reminder: Your report is currently in escrow. It will be automatically released to administrators in approximately 12 hours. If you wish to permanently cancel this report, you can do so now via the Retract Report page.')
             }
           });

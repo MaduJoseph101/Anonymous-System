@@ -97,7 +97,6 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
               const tierInfo = CREDIBILITY_TIER_CONFIG[compositeTier] || CREDIBILITY_TIER_CONFIG.UNAVAILABLE;
               
               const isLowTier = compositeTier === 'LOW';
-              const borderClass = isLowTier ? 'border-l-4 border-l-amber-400' : 'border-l-4 border-l-transparent';
               
               // Handle truncation for location
               let loc = report.location || '';
@@ -110,7 +109,7 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
                 <tr 
                   key={report.id} 
                   onClick={() => onReportClick(report.id)}
-                  className={`hover:bg-blue-50 cursor-pointer transition-colors group ${borderClass}`}
+                  className="hover:bg-blue-50 cursor-pointer transition-colors group border-b border-slate-100"
                 >
                   <td className="px-4 py-4 w-1 hidden sm:table-cell">
                     {isLowTier && (
@@ -122,7 +121,7 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
                     <div className="flex items-center gap-2">
                        <span className="font-mono text-blue-700 font-bold truncate max-w-[100px] sm:max-w-none">{trackingCode}</span>
                        {isVerified && (
-                         <CheckCircle className="w-4 h-4 text-green-500 shrink-0" title="Verified Student" />
+                          <CheckCircle className="w-4 h-4 text-green-500 shrink-0" title="Verified Student" />
                        )}
                     </div>
                   </td>
@@ -136,7 +135,7 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
                   </td>
                   
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${statusInfo.colour}`}>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">
                       {statusInfo.label}
                     </span>
                   </td>
@@ -183,13 +182,10 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
         </table>
       </div>
 
-      <div className="md:hidden divide-y divide-slate-100">
+      <div className="md:hidden space-y-4 p-4 bg-slate-50/50">
         {reports.map((report) => {
           const trackingCode = report.trackingCode || report.tracking_code;
-          const compositeTier = report.compositeTier || report.composite_tier;
-          const aiStatus = report.aiAnalysisStatus || report.ai_analysis_status;
           const statusInfo = STATUS_CONFIG[report.status] || { label: report.status, colour: 'bg-slate-100 text-slate-600' };
-          const tierInfo = CREDIBILITY_TIER_CONFIG[compositeTier] || CREDIBILITY_TIER_CONFIG.UNAVAILABLE;
           const isVerified = report.isStudentVerified || report.is_student_verified;
           const messageCount = report._count?.messages ?? report.messages?.length ?? 0;
 
@@ -197,34 +193,39 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
             <button
               key={report.id}
               onClick={() => onReportClick(report.id)}
-              className="w-full text-left p-4 bg-white hover:bg-slate-50 transition-colors"
+              className="w-full text-left p-4.5 bg-white hover:bg-slate-50/50 transition-colors flex flex-col gap-2 rounded-xl border border-slate-200 shadow-sm"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-blue-700 font-bold text-sm">{trackingCode}</span>
-                    {isVerified && <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />}
-                  </div>
-                  <div className="text-sm font-medium text-slate-800 mt-1">{formatCategory(report.category)}</div>
-                  <div className="text-xs text-slate-500 mt-1">{report.location || '-'}</div>
+              {/* Header: Tracking Code, Relative Time */}
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-mono text-blue-600 font-extrabold tracking-tight">{trackingCode}</span>
+                  {isVerified && <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />}
                 </div>
-                <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${statusInfo.colour}`}>{statusInfo.label}</div>
+                <span className="text-slate-400 font-bold">{formatRelativeTime(report.createdAt || report.created_at)}</span>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">AI Tier</div>
-                  <div className="mt-1 text-xs font-extrabold text-slate-800">
-                    {aiStatus === 'COMPLETE' || aiStatus === 'COMPLETED' ? tierInfo.label : 'Pending'}
-                  </div>
-                </div>
-                <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Submitted</div>
-                  <div className="mt-1 text-xs font-extrabold text-slate-800">{formatRelativeTime(report.createdAt || report.created_at)}</div>
-                </div>
+
+              {/* Body: Category and Location */}
+              <div>
+                <div className="text-sm font-extrabold text-slate-800">{formatCategory(report.category)}</div>
+                {report.location && (
+                  <div className="text-xs text-slate-500 font-bold mt-0.5 truncate">{report.location}</div>
+                )}
               </div>
-              <div className="mt-3 flex items-center justify-between text-xs text-slate-500 font-bold">
-                <span>{messageCount ? `${messageCount} messages` : 'No messages'}</span>
-                <span>{compositeTier || 'UNAVAILABLE'}</span>
+
+              {/* Footer: Status and Message Count */}
+              <div className="flex items-center justify-between mt-1 pt-2 border-t border-slate-50">
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black tracking-wide uppercase ${statusInfo.colour}`}>
+                    {statusInfo.label}
+                  </span>
+                </div>
+
+                {messageCount > 0 && (
+                  <div className="flex items-center gap-1 text-slate-500 text-xs font-bold">
+                    <MessageCircle className="w-3.5 h-3.5 text-slate-400" />
+                    <span>{messageCount}</span>
+                  </div>
+                )}
               </div>
             </button>
           );

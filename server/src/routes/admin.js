@@ -433,7 +433,7 @@ router.patch('/reports/:id/status',
       await prisma.message.create({
         data: {
           report_id: report.id,
-          sender_type: 'SYSTEM',
+          sender_type: 'ADMIN',
           content: encrypt(`System Update: Your report status has been updated to "${statusLabels[status] || status}".`)
         }
       });

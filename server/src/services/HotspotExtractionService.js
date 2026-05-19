@@ -116,6 +116,26 @@ Description: ${report.description || 'Not specified'}
       return fallback;
     }
   }
+
+  static pruneCache(resolvedReports) {
+    const activeKeys = new Set(resolvedReports.map(report => {
+      return [
+        report.location,
+        report.location_description,
+        report.reporter_context,
+        report.description
+      ]
+        .map((value) => cleanLabel(value || '').toLowerCase())
+        .filter(Boolean)
+        .join(' | ');
+    }).filter(Boolean));
+
+    for (const key of this.cache.keys()) {
+      if (!activeKeys.has(key)) {
+        this.cache.delete(key);
+      }
+    }
+  }
 }
 
 module.exports = HotspotExtractionService;

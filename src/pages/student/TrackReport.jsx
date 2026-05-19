@@ -188,7 +188,7 @@ export default function TrackReport() {
                 <div className="p-6 md:p-8 space-y-6">
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Description</h3>
-                    <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/70 border border-slate-100 p-5 rounded-xl whitespace-pre-wrap">
+                    <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/70 border border-slate-100 p-4 sm:p-5 rounded-xl whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                       {report.description || 'Not provided'}
                     </div>
                   </div>
@@ -204,7 +204,7 @@ export default function TrackReport() {
                     ].map((field) => (
                       <div key={field.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{field.label}</p>
-                        <p className="text-sm font-semibold text-slate-800 leading-relaxed whitespace-pre-wrap">{field.value}</p>
+                        <p className="text-sm font-semibold text-slate-800 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{field.value}</p>
                       </div>
                     ))}
                   </div>

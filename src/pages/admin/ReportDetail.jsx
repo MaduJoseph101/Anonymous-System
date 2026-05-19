@@ -112,7 +112,7 @@ export default function ReportDetail() {
   const isVideo = (item) => getMediaType(item).startsWith('video/');
   
   // Tab classes
-  const tabClass = (tabId) => `px-4 py-3 font-bold text-sm tracking-wide transition-colors border-b-2 ${activeTab === tabId ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`;
+  const tabClass = (tabId) => `px-4 py-3 font-bold text-sm tracking-wide transition-colors border-b-2 whitespace-nowrap ${activeTab === tabId ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`;
 
   // Panels rendering logic
   const renderDetails = () => (
@@ -168,11 +168,11 @@ export default function ReportDetail() {
       {/* Section 2 - Content Card */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
         <div className="border-b border-slate-100 bg-slate-50 p-5 flex items-center justify-between">
-           <h2 className="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+           <h2 className="text-sm sm:text-base font-extrabold text-slate-800 flex items-center gap-2">
              <FileText className="w-5 h-5 text-indigo-500" />
              Incident Description
            </h2>
-           <div className="text-sm font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
+           <div className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
              <Tag className="w-4 h-4" /> {formatCategory(report.category)}
            </div>
         </div>
@@ -182,7 +182,7 @@ export default function ReportDetail() {
            {/* Primary Description */}
            <div>
             <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2">Description</div>
-             <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/50 border border-slate-100 p-5 rounded-xl whitespace-pre-wrap shadow-inner">
+             <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/70 border border-slate-100 p-4 sm:p-5 rounded-xl whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                {report.description}
              </div>
            </div>
@@ -199,7 +199,7 @@ export default function ReportDetail() {
              {report.locationDescription && (
                <div>
                  <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2">Location Note</div>
-                 <div className="text-sm text-slate-700 italic">
+                 <div className="text-sm text-slate-700 italic" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                    &ldquo;{report.locationDescription}&rdquo;
                  </div>
                </div>
@@ -219,7 +219,7 @@ export default function ReportDetail() {
            {report.reporterContext && (
              <div className="pt-4 border-t border-slate-100">
                <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2">Reporter Note</div>
-               <div className="font-medium text-slate-800 leading-relaxed mb-2">
+               <div className="font-medium text-slate-800 leading-relaxed mb-2" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                  {report.reporterContext}
                </div>
                <div className="flex items-start gap-1.5 text-xs text-indigo-700 bg-indigo-50 p-2.5 rounded-lg border border-indigo-100">
@@ -232,7 +232,7 @@ export default function ReportDetail() {
            {report.uncertaintyStatement && (
              <div className="pt-4 border-t border-slate-100">
                <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2">Uncertainty Note</div>
-               <div className="font-medium text-slate-800 leading-relaxed mb-2">
+               <div className="font-medium text-slate-800 leading-relaxed mb-2" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                  {report.uncertaintyStatement}
                </div>
                <div className="flex items-start gap-1.5 text-xs text-emerald-800 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
@@ -248,11 +248,11 @@ export default function ReportDetail() {
       {/* Section 2b - Reporter Inputs */}
       <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
         <div className="border-b border-slate-100 bg-slate-50 p-5 flex items-center justify-between">
-          <h2 className="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+          <h2 className="text-sm sm:text-base font-extrabold text-slate-800 flex items-center gap-2">
             <Shield className="w-5 h-5 text-blue-500" />
             Reporter Details
           </h2>
-          <div className="text-xs font-black uppercase tracking-widest text-slate-500">
+          <div className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500">
             {report.isStudentVerified || report.is_student_verified ? 'Verified' : 'Unverified'}
           </div>
         </div>
@@ -267,23 +267,23 @@ export default function ReportDetail() {
               { label: 'Reporter Note', value: report.reporterContext || report.reporter_context || 'Not provided' },
               { label: 'Verification', value: report.verificationMethod || report.verification_method || 'Not used' }
             ].map((field) => (
-              <div key={field.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+              <div key={field.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{field.label}</div>
-                <div className="text-sm font-semibold text-slate-800 leading-relaxed whitespace-pre-wrap">{field.value}</div>
+                <div className="text-sm font-semibold text-slate-800 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{field.value}</div>
               </div>
             ))}
           </div>
 
           <div>
             <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2">Uncertainty Note</div>
-            <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/50 border border-slate-100 p-5 rounded-xl whitespace-pre-wrap shadow-inner">
+            <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/70 border border-slate-100 p-4 sm:p-5 rounded-xl whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
               {report.uncertaintyStatement || report.uncertainty_statement || 'Not provided'}
             </div>
           </div>
 
           <div>
             <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2">Description</div>
-            <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/50 border border-slate-100 p-5 rounded-xl whitespace-pre-wrap shadow-inner">
+            <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/70 border border-slate-100 p-4 sm:p-5 rounded-xl whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
               {report.reporterInputs?.description || report.description}
             </div>
           </div>

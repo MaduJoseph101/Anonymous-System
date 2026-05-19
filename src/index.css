@@ -55,3 +55,25 @@ path:focus {
 .recharts-legend-item:focus {
   outline: none !important;
 }
+
+/* Hide scrollbars globally for cleaner UI */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
+}
+
+/* Force pointer cursor on all clickable elements globally */
+a, 
+button, 
+select, 
+input[type="submit"], 
+input[type="button"], 
+input[type="checkbox"], 
+input[type="radio"],
+[role="button"],
+.cursor-pointer {
+  cursor: pointer !important;
+}

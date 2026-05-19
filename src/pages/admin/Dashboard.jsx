@@ -136,23 +136,23 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-slate-800"></div>
-            <div className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3">Total Tracking</div>
-            <div className="text-4xl font-extrabold text-slate-800 tracking-tight">{totalReportsCount}</div>
+            <div className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3">Total Tracking</div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-slate-800 tracking-tight">{totalReportsCount}</div>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-            <div className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3">Pending Review</div>
-            <div className="text-4xl font-extrabold text-blue-600 tracking-tight">{pendingReviewCount}</div>
+            <div className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3">Pending Review</div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-blue-600 tracking-tight">{pendingReviewCount}</div>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
-            <div className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3">Under Investigation</div>
-            <div className="text-4xl font-extrabold text-purple-600 tracking-tight">{underInvestigationCount}</div>
+            <div className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3">Under Investigation</div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-purple-600 tracking-tight">{underInvestigationCount}</div>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-            <div className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-1.5">Actionable Flags <AlertCircle className="w-3.5 h-3.5 text-slate-400" /></div>
-            <div className="text-4xl font-extrabold text-amber-600 tracking-tight">{lowCredibilityCount}</div>
+            <div className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-1.5">Actionable Flags <AlertCircle className="w-3.5 h-3.5 text-slate-400" /></div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-amber-600 tracking-tight">{lowCredibilityCount}</div>
           </div>
         </div>
 

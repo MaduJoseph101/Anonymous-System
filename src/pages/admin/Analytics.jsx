@@ -103,7 +103,7 @@ export default function Analytics() {
                <TrendingUp className="w-4 h-4 text-indigo-500" /> System Total Density
             </div>
             {loading ? <div className="h-10 bg-slate-200 animate-pulse rounded w-24"></div> : (
-              <div className="text-4xl font-extrabold text-slate-800 tracking-tighter relative z-10">{analyticsData.totalReports || 0}</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tighter relative z-10">{analyticsData.totalReports || 0}</div>
             )}
           </div>
           
@@ -113,7 +113,7 @@ export default function Analytics() {
                <Clock className="w-4 h-4 text-emerald-500" /> Avg. Time
             </div>
             {loading ? <div className="h-10 bg-slate-200 animate-pulse rounded w-32"></div> : (
-              <div className="text-4xl font-extrabold text-emerald-700 tracking-tighter relative z-10">{analyticsData.averageResolutionTime ? `${analyticsData.averageResolutionTime} hrs` : 'N/A'}</div>
+              <div className="text-2xl sm:text-3xl font-extrabold text-emerald-700 tracking-tighter relative z-10">{analyticsData.averageResolutionTime ? `${analyticsData.averageResolutionTime} hrs` : 'N/A'}</div>
             )}
           </div>
 
@@ -122,7 +122,7 @@ export default function Analytics() {
              <div className="text-purple-900 text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2 z-10 relative">
                 <Calendar className="w-4 h-4 text-purple-500" /> Active Frame
              </div>
-             <div className="text-4xl font-extrabold text-purple-700 tracking-tighter relative z-10">Last {days} days</div>
+             <div className="text-2xl sm:text-3xl font-extrabold text-purple-700 tracking-tighter relative z-10">Last {days} days</div>
           </div>
         </div>
 
@@ -226,7 +226,7 @@ const ChartCard = ({ title, loading, children }) => (
           <RefreshCw className="w-8 h-8 text-slate-300 animate-spin" />
         </div>
       ) : (
-        <div className="w-full h-full animate-in fade-in zoom-in-95 duration-500">
+        <div className="w-full h-full">
           {children}
         </div>
       )}

@@ -58,16 +58,20 @@ export default function TrackingCodeDisplay({ trackingCode, isInEscrow, isVerifi
       <div className="bg-slate-50 border border-slate-200 rounded-xl p-8 text-center shadow-inner relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
         <p className="text-sm font-bold tracking-widest text-slate-500 uppercase mb-4">Tracking code</p>
-        <div className="flex flex-col md:flex-row items-center justify-center gap-3">
-          <div className="text-xl md:text-3xl font-mono font-bold tracking-widest text-slate-800 bg-white px-8 py-5 rounded-xl border border-slate-200 shadow-sm select-all">
+        <div className="flex flex-row items-center justify-center gap-2 max-w-full">
+          <div className="text-sm sm:text-xl md:text-3xl font-mono font-black tracking-wider sm:tracking-widest text-slate-800 bg-white px-4 py-3.5 sm:px-8 sm:py-5 rounded-xl border border-slate-200 shadow-sm select-all min-w-0 truncate">
             {trackingCode || 'CODE_ERROR'}
           </div>
           <button 
             onClick={() => copyToClipboard(trackingCode)}
-            className="p-5 bg-white hover:bg-slate-100 rounded-xl border border-slate-200 text-slate-700 transition-colors shadow-sm w-full md:w-auto"
+            className="p-3.5 sm:p-5 bg-white hover:bg-slate-50 rounded-xl border border-slate-200 text-slate-700 transition-colors shadow-sm shrink-0 flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 active:scale-95 cursor-pointer"
             title="Copy tracking code"
           >
-            {copiedTrack ? <span className="text-green-600 font-bold text-sm block min-w-[32px]">Copied!</span> : <Copy className="w-7 h-7 mx-auto" />}
+            {copiedTrack ? (
+              <CheckCircle className="w-5 h-5 sm:w-7 sm:h-7 text-green-600 shrink-0" />
+            ) : (
+              <Copy className="w-5 h-5 sm:w-7 sm:h-7 text-slate-500 shrink-0" />
+            )}
           </button>
         </div>
         <p className="text-sm text-red-500 font-bold mt-5 inline-block bg-red-50 px-4 py-2 rounded-lg border border-red-100">

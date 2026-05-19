@@ -21,11 +21,11 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
       
       {/* Header */}
       <div className="bg-slate-50 border-b border-slate-200 px-6 py-5 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3 text-slate-800 font-extrabold text-lg tracking-tight">
-          <Activity className="w-6 h-6 text-indigo-600" />
+        <div className="flex items-center gap-3 text-slate-800 font-extrabold text-sm sm:text-base tracking-tight">
+          <Activity className="w-5 h-5 text-indigo-600" />
           Assessment
         </div>
-        <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm ${tierConfig.colour}`}>
+        <div className={`px-3 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-sm ${tierConfig.colour}`}>
           {tierConfig.label}
         </div>
       </div>
@@ -38,7 +38,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
            <div className="mt-5 grid grid-cols-1 gap-3">
              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Conclusion</div>
-               <p className="text-sm text-slate-800 font-medium leading-relaxed whitespace-pre-wrap">
+               <p className="text-sm text-slate-800 font-medium leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                  {forensicConclusion || geminiDetail?.overallSummary || geminiDetail?.adminGuidance || 'No conclusion available.'}
                </p>
              </div>
@@ -67,14 +67,14 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                {geminiDetail.confidence && (
                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Confidence</div>
-                 <p className="text-sm font-semibold text-slate-800">{geminiDetail.confidence}</p>
+                 <p className="text-sm font-semibold text-slate-800" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{geminiDetail.confidence}</p>
                </div>
              )}
 
                {geminiDetail.overallSummary && (
                  <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                    <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Summary</div>
-                   <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">{geminiDetail.overallSummary}</p>
+                   <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{geminiDetail.overallSummary}</p>
                  </div>
                )}
 
@@ -88,7 +88,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                          </h4>
                          <span className="text-xs font-bold text-slate-500">{dimension.score}/25</span>
                        </div>
-                       <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{dimension.observations}</p>
+                       <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{dimension.observations}</p>
                      </div>
                    ))}
                  </div>
@@ -99,7 +99,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                    <h4 className="text-xs font-bold text-red-800 uppercase tracking-widest flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Flags</h4>
                    <ul className="space-y-2">
                      {geminiDetail.flaggedConcerns.map((concern, i) => (
-                       <li key={i} className="text-sm font-medium text-red-800 leading-relaxed bg-red-50/80 border border-red-100 px-4 py-3 rounded-lg shadow-sm">
+                       <li key={i} className="text-sm font-medium text-red-800 leading-relaxed bg-red-50/80 border border-red-100 px-4 py-3 rounded-lg shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                          {concern}
                        </li>
                      ))}
@@ -112,7 +112,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                    <h4 className="text-xs font-bold text-green-800 uppercase tracking-widest flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Positives</h4>
                    <ul className="space-y-2">
                      {geminiDetail.positiveIndicators.map((ind, i) => (
-                       <li key={i} className="text-sm font-medium text-green-800 flex items-start gap-2 bg-green-50/80 border border-green-100 px-4 py-3 rounded-lg shadow-sm">
+                       <li key={i} className="text-sm font-medium text-green-800 flex items-start gap-2 bg-green-50/80 border border-green-100 px-4 py-3 rounded-lg shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                          {ind}
                        </li>
                      ))}
@@ -125,7 +125,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                    <h4 className="text-xs font-bold text-indigo-800 uppercase tracking-widest flex items-center gap-1"><Info className="w-3.5 h-3.5" /> CBCA Notes</h4>
                    <ul className="space-y-2">
                      {geminiDetail.cbcaStyleObservations.map((item, i) => (
-                       <li key={i} className="text-sm font-medium text-indigo-800 leading-relaxed bg-indigo-50 border border-indigo-100 px-4 py-3 rounded-lg shadow-sm">
+                       <li key={i} className="text-sm font-medium text-indigo-800 leading-relaxed bg-indigo-50 border border-indigo-100 px-4 py-3 rounded-lg shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                          <strong className="block text-xs uppercase tracking-widest mb-1">{item.criterion} - {item.status}</strong>
                          {item.observation}
                        </li>
@@ -169,7 +169,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
           {structuralDetail?.summary && (
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-4">
               <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Summary</div>
-              <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">{structuralDetail.summary}</p>
+              <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{structuralDetail.summary}</p>
             </div>
           )}
 
@@ -178,10 +178,12 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
               {structuralDetail.cbcaCriteria.map((item, i) => (
                 <div key={i} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between gap-3 mb-2">
-                    <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">{item.criterion}</h4>
+                    <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">
+                      {item.criterion ? item.criterion.split('/')[0].trim() : ''}
+                    </h4>
                     <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">{item.status}</span>
                   </div>
-                  <p className="text-sm text-slate-700 leading-relaxed">{item.observation}</p>
+                  <p className="text-sm text-slate-700 leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{item.observation}</p>
                 </div>
               ))}
             </div>
@@ -190,7 +192,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
           {structuralDetail?.positiveIndicators && structuralDetail.positiveIndicators.length > 0 ? (
              <ul className="space-y-2">
                {structuralDetail.positiveIndicators.map((ind, i) => (
-                 <li key={i} className="text-sm font-medium text-blue-800 flex items-center gap-2.5 bg-blue-50/80 border border-blue-100 px-4 py-3 rounded-lg shadow-sm">
+                 <li key={i} className="text-sm font-medium text-blue-800 flex items-center gap-2.5 bg-blue-50/80 border border-blue-100 px-4 py-3 rounded-lg shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                    <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
                      <CheckCircle className="w-3.5 h-3.5" />
                    </div>
@@ -226,7 +228,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                     <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${ano.severity === 'HIGH' ? 'text-red-600' : ano.severity === 'MEDIUM' ? 'text-amber-600' : 'text-indigo-600'}`} />
                     <div>
                       <strong className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-80">{ano.type}</strong>
-                      <span className="text-sm font-medium leading-relaxed">{ano.detail}</span>
+                      <span className="text-sm font-medium leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{ano.detail}</span>
                     </div>
                   </div>
                 );
@@ -252,7 +254,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
             <div className="space-y-3">
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Summary</div>
-                <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+                <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                   {similarityDetail.interpretation || (similarityDetail.hasSuspiciousPattern ? 'A similarity pattern was detected.' : 'No suspicious similarity pattern was detected.')}
                 </p>
               </div>
@@ -264,7 +266,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                         <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">{match.trackingCode || match.tracking_code || `Match ${i + 1}`}</h4>
                         <span className="text-xs font-bold text-slate-500">{match.similarityScore ?? match.score ?? 'N/A'}%</span>
                       </div>
-                      <p className="text-sm text-slate-700 leading-relaxed">{match.reason || match.observation || 'No description provided.'}</p>
+                      <p className="text-sm text-slate-700 leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{match.reason || match.observation || 'No description provided.'}</p>
                     </div>
                   ))}
                 </div>
@@ -289,7 +291,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
           <div className="space-y-3">
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
               <div className="text-[10px] font-black uppercase tracking-widest text-emerald-700 mb-2">Overall</div>
-              <p className="text-sm text-emerald-950 leading-relaxed whitespace-pre-wrap">{overallSummary || geminiDetail?.overallSummary || structuralDetail?.summary || 'No overall summary available.'}</p>
+              <p className="text-sm text-emerald-950 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{overallSummary || geminiDetail?.overallSummary || structuralDetail?.summary || 'No overall summary available.'}</p>
             </div>
             {signals.length > 0 && (
               <div className="grid grid-cols-1 gap-3">
@@ -299,7 +301,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                       <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">{signal.source}</h4>
                       <span className="text-xs font-bold text-slate-500">{signal.weight}</span>
                     </div>
-                    <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{signal.summary}</p>
+                    <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{signal.summary}</p>
                   </div>
                 ))}
               </div>
@@ -315,9 +317,9 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
            <div className="absolute top-0 right-0 w-24 h-24 bg-amber-200/30 rounded-full blur-2xl -mr-6 -mt-6"></div>
            <div className="flex items-center gap-2.5 mb-2.5 text-amber-900 font-black tracking-tight" style={{textTransform: 'uppercase'}}>
              <AlertTriangle className="w-6 h-6" />
-             ⚠ Advisory
+             Advisory
            </div>
-           <p className="text-sm text-amber-900 leading-relaxed font-bold">
+           <p className="text-sm text-amber-900 leading-relaxed font-bold" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
              {MANDATORY_AI_DISCLAIMER}
            </p>
         </div>

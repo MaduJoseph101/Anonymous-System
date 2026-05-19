@@ -118,6 +118,9 @@ router.get('/hotspots', async (req, res, next) => {
       };
     }));
 
+    // Prune the extraction cache to ensure deleted/retracted reports are not stored in memory
+    HotspotExtractionService.pruneCache(resolvedReports);
+
     resolvedReports.forEach((report) => {
       const locationLabel = report.extractedLocation || 'Unknown location';
       const normalizedKey = locationLabel.toLowerCase();

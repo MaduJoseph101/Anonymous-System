@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { Plus, Edit, UserCheck, UserX, Key, Users, Info, Copy } from 'lucide-react';
+import { Plus, Edit, UserCheck, UserX, Key, Users, Info, Copy, Eye, EyeOff } from 'lucide-react';
 
 import { api } from '../../services/api';
 import AdminNavbar from '../../components/admin/AdminNavbar';
@@ -20,6 +20,14 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Reset showPassword when add modal closes
+  useEffect(() => {
+    if (!showAddModal) {
+      setShowPassword(false);
+    }
+  }, [showAddModal]);
 
   const { register: registerAdd, handleSubmit: handleAddSubmit, reset: resetAdd, formState: { errors: addErrors } } = useForm();
   const { register: registerEdit, handleSubmit: handleEditSubmit, setValue } = useForm();
@@ -53,7 +61,12 @@ export default function UsersPage() {
   const onAddSubmit = async (data) => {
     setSubmitting(true);
     try {
-      await api.admin.createUser(data);
+      await api.admin.createUser({
+        full_name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role
+      });
       toast.success('System administrator successfully boarded.');
       setShowAddModal(false);
       resetAdd();
@@ -250,7 +263,25 @@ export default function UsersPage() {
           </div>
           <div>
             <label className="block text-xs font-black uppercase tracking-widest text-slate-800 mb-1.5 pl-1">Password</label>
-            <input type="password" {...registerAdd('password', { required: true, minLength: 8 })} className="w-full px-4 py-3.5 bg-slate-50 font-bold text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white shadow-inner transition-colors" />
+            <div className="relative">
+              <input 
+                type={showPassword ? 'text' : 'password'} 
+                {...registerAdd('password', { required: true, minLength: 8 })} 
+                className="w-full px-4 py-3.5 pr-12 bg-slate-50 font-bold text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white shadow-inner transition-colors" 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer active:scale-95 flex items-center justify-center border border-transparent"
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
             {addErrors.password && <span className="text-[11px] text-red-600 uppercase tracking-widest font-black mt-2 inline-block border-l-2 border-red-500 pl-2">Use at least 8 characters.</span>}
           </div>
           <div>
