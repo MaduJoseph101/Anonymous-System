@@ -21,8 +21,6 @@ export const api = {
     trackReport: (trackingCode) => requestJson(`/reports/track/${trackingCode}`),
     replyToReport: (data) => requestJson('/reports/reply', { method: 'POST', body: JSON.stringify(data) }),
     retractReport: (data) => requestJson('/reports/retract', { method: 'POST', body: JSON.stringify(data) }),
-    requestOtp: (data) => requestJson('/verification/request-otp', { method: 'POST', body: JSON.stringify(data) }),
-    verifyOtp: (data) => requestJson('/verification/verify-otp', { method: 'POST', body: JSON.stringify(data) }),
   },
   admin: {
     login: (credentials) => requestJson('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),

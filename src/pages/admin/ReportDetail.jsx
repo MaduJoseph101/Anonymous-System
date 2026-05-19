@@ -8,6 +8,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 
 import { api } from '../../services/api';
+import { resolveBaseUrl } from '../../services/apiClient';
 import { formatCategory, formatDateTime } from '../../utils/formatters';
 import { STATUS_CONFIG, CREDIBILITY_TIER_CONFIG } from '../../utils/constants';
 
@@ -100,12 +101,15 @@ export default function ReportDetail() {
     const candidate = item?.url || item?.fileUrl || item?.path || item?.secureUrl;
     if (!candidate) return null;
     if (/^https?:\/\//i.test(candidate)) return candidate;
-    const apiBase = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-    const serverBase = apiBase.replace(/\/api\/?$/, '');
-    if (candidate.startsWith('/uploads')) {
-      return `${serverBase}${candidate}`;
+    
+    // Normalize backslashes to forward slashes and ensure a leading slash
+    let normalizedPath = candidate.replace(/\\/g, '/');
+    if (!normalizedPath.startsWith('/')) {
+      normalizedPath = '/' + normalizedPath;
     }
-    return `${apiBase}${candidate.startsWith('/') ? '' : '/'}${candidate}`;
+    
+    const baseUrl = resolveBaseUrl().replace(/\/api\/?$/, '');
+    return `${baseUrl}${normalizedPath}`;
   };
 
   const getMediaType = (item) => item?.mimeType || item?.type || item?.contentType || '';

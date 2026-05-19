@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { Shield, Search, Clock, CheckCircle, AlertTriangle, ArrowLeft, MessageCircle } from 'lucide-react';
+import { Shield, Search, Clock, CheckCircle, AlertTriangle, ArrowLeft, MessageCircle, X } from 'lucide-react';
 import { api } from '../../services/api';
 import { resolveBaseUrl } from '../../services/apiClient';
 import { STATUS_CONFIG } from '../../utils/constants';
@@ -13,20 +13,10 @@ export default function TrackReport() {
   const [searchParams] = useSearchParams();
   const [report, setReport] = useState(null);
   const [pageState, setPageState] = useState('idle'); // 'idle' | 'loading' | 'found' | 'not_found' | 'error'
-  const [isRetracting, setIsRetracting] = useState(false);
-  const [showRetractConfirm, setShowRetractConfirm] = useState(false);
 
   const { register, handleSubmit, setValue } = useForm();
 
-  useEffect(() => {
-    const codeParam = searchParams.get('code');
-    if (codeParam) {
-      setValue('trackingCode', codeParam);
-      handleTrackSubmit({ trackingCode: codeParam });
-    }
-  }, [searchParams, setValue]);
-
-  const handleTrackSubmit = async (data) => {
+  async function handleTrackSubmit(data) {
     const code = data.trackingCode?.trim().toUpperCase();
     if (!code) return;
 
@@ -51,7 +41,17 @@ export default function TrackReport() {
         toast.error(err.message || 'An error occurred while tracking the report.');
       }
     }
-  };
+  }
+
+  useEffect(() => {
+    const codeParam = searchParams.get('code');
+    if (codeParam) {
+      setValue('trackingCode', codeParam);
+      setTimeout(() => {
+        handleTrackSubmit({ trackingCode: codeParam });
+      }, 0);
+    }
+  }, [searchParams, setValue]);
 
 
 
@@ -59,9 +59,15 @@ export default function TrackReport() {
   const resolveMediaUrl = (candidate) => {
     if (!candidate) return null;
     if (/^https?:\/\//i.test(candidate)) return candidate;
+    
+    // Normalize backslashes to forward slashes and ensure a leading slash
+    let normalizedPath = candidate.replace(/\\/g, '/');
+    if (!normalizedPath.startsWith('/')) {
+      normalizedPath = '/' + normalizedPath;
+    }
+    
     const baseUrl = resolveBaseUrl().replace(/\/api\/?$/, '');
-    if (candidate.startsWith('/uploads')) return `${baseUrl}${candidate}`;
-    return `${resolveBaseUrl()}${candidate.startsWith('/') ? '' : '/'}${candidate}`;
+    return `${baseUrl}${normalizedPath}`;
   };
 
   return (
@@ -110,15 +116,22 @@ export default function TrackReport() {
 
         {/* Not Found State */}
         {pageState === 'not_found' && (
-          <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center animate-in fade-in slide-in-from-bottom-4">
-            <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8" />
+          <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center animate-in fade-in slide-in-from-bottom-4 relative">
+            <button 
+              onClick={() => setPageState('idle')}
+              className="absolute top-3 left-3 p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
+              aria-label="Dismiss error"
+            >
+              <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-5 h-5 sm:w-7 sm:h-7" />
             </div>
-            <h2 className="text-xl font-bold text-slate-800 mb-3">No report found</h2>
-            <p className="text-slate-600 mb-8 max-w-md mx-auto leading-relaxed">
+            <h2 className="text-base sm:text-lg font-bold text-slate-800 mb-2">No report found</h2>
+            <p className="text-[11px] sm:text-[13px] text-slate-600 mb-6 max-w-md mx-auto leading-relaxed text-left sm:text-center px-2">
               Please check the code carefully. Tracking codes look like <strong className="font-mono bg-slate-100 px-1 rounded">RT-2024-A3F9C2</strong>.
             </p>
-            <Link to="/submit" className="inline-block bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium px-6 py-3 rounded-xl shadow-sm transition-colors">
+            <Link to="/submit" className="inline-block bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-medium px-4.5 py-2 sm:px-5.5 sm:py-2.5 rounded-xl shadow-sm transition-colors text-[11px] sm:text-[13px]">
               Submit a Report
             </Link>
           </div>

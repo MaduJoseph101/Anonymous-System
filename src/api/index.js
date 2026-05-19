@@ -44,12 +44,6 @@ export const replyToReport = (trackingCode, message) =>
 export const retractReport = (retractionCode) =>
   api.post('/reports/retract', { retractionCode: retractionCode.trim() });
 
-export const requestOTP = (email) =>
-  api.post('/verification/request-otp', { email });
-
-export const verifyOTP = (email, otp) =>
-  api.post('/verification/verify-otp', { email, otp });
-
 export const adminLogin = (email, password) =>
   api.post('/auth/login', { email, password });
 

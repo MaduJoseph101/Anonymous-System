@@ -10,7 +10,6 @@ import CategorySelector from '../../components/student/CategorySelector';
 import StructuredFields from '../../components/student/StructuredFields';
 import EthicalAcknowledgement from '../../components/student/EthicalAcknowledgement';
 import CoolingOffTimer from '../../components/student/CoolingOffTimer';
-import VerificationSection from '../../components/student/VerificationSection';
 import TrackingCodeDisplay from '../../components/student/TrackingCodeDisplay';
 
 export default function SubmitReport() {
@@ -31,7 +30,6 @@ export default function SubmitReport() {
   const [result, setResult] = useState(null);
   const [acknowledged, setAcknowledged] = useState(false);
   const [coolingComplete, setCoolingComplete] = useState(false);
-  const [verificationToken, setVerificationToken] = useState('');
 
   const handleCoolingComplete = useCallback(() => {
     setCoolingComplete(true);
@@ -78,7 +76,6 @@ export default function SubmitReport() {
     if (data.uncertaintyStatement) payload.uncertaintyStatement = data.uncertaintyStatement;
     if (data.reporterContext) payload.reporterContext = data.reporterContext;
     if (data.timeOfDay) payload.timeOfDay = data.timeOfDay;
-    if (verificationToken) payload.verificationToken = verificationToken;
     if (selectedMedia) payload.media = selectedMedia;
 
     try {
@@ -93,10 +90,7 @@ export default function SubmitReport() {
     }
   };
 
-  const handleTokenGenerated = useCallback((token) => {
-    setVerificationToken(token);
-    toast.success('Verification token attached');
-  }, []);
+
 
   if (submissionState === 'success' && result) {
     return (
@@ -104,7 +98,7 @@ export default function SubmitReport() {
          <TrackingCodeDisplay 
            trackingCode={result.trackingCode}
            isInEscrow={result.isInEscrow}
-           isVerified={result.isStudentVerified || !!verificationToken}
+           isVerified={result.isStudentVerified}
            message={result.message}
            onTrackReport={() => navigate('/track')}
            onReturnHome={() => navigate('/')}
@@ -139,7 +133,7 @@ export default function SubmitReport() {
 
       {/* Privacy notice banner */}
       <div className="bg-blue-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 md:px-0 py-3 text-sm font-medium tracking-wide">
+        <div className="max-w-4xl mx-auto px-4 md:px-0 py-3 text-xs md:text-sm font-medium tracking-wide md:text-center">
           Your identity is protected. No name, student ID, email, or IP address is collected.
         </div>
       </div>
@@ -173,14 +167,7 @@ export default function SubmitReport() {
             </div>
           )}
 
-          <div className="space-y-2">
-            <VerificationSection onTokenGenerated={handleTokenGenerated} />
-            {verificationToken && (
-              <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 px-4 py-3 rounded-lg border border-green-200 font-bold animate-in fade-in shadow-sm">
-                ✓ Verification token ready — will be included with your report
-              </div>
-            )}
-          </div>
+
 
           {selectedCategory && requiresCooling && (
             <div className="animate-in fade-in">

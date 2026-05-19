@@ -80,34 +80,9 @@ router.post('/submit',
       const trackingCode = generateTrackingCode();
       const requiresEscrow = EscrowService.requiresEscrow(category);
 
-      // Handle optional verification token
-      let isStudentVerified = false;
-      let verificationWarning = null;
-
-      if (verificationToken) {
-        try {
-          const tokenHash = hashString(verificationToken.trim());
-          const tokenRecord = await prisma.verificationToken.findUnique({
-            where: { token_hash: tokenHash }
-          });
-
-          if (tokenRecord && !tokenRecord.is_used &&
-              tokenRecord.expires_at > new Date()) {
-            await prisma.verificationToken.update({
-              where: { id: tokenRecord.id },
-              data: { is_used: true, used_at: new Date() }
-            });
-            isStudentVerified = true;
-          } else {
-            verificationWarning = tokenRecord?.is_used
-              ? 'Verification token already used. Each token can only be used once.'
-              : 'Verification token expired or not recognised.';
-          }
-        } catch (tokenError) {
-          console.error('Token validation error:', tokenError.message);
-          verificationWarning = 'Token validation failed. Report submitted without verification.';
-        }
-      }
+      // Student verification via email has been removed from the platform
+      const isStudentVerified = false;
+      const verificationWarning = null;
 
       // Create report — ALL sensitive fields encrypted before storage
       const report = await prisma.report.create({

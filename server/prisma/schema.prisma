@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -155,23 +154,3 @@ model RTCRegistry {
   last_updated        DateTime @default(now())
 }
 
-// Short-lived OTP verification tokens. Email is stored as a hash only.
-model VerificationToken {
-  id         String    @id @default(uuid())
-  token_hash String    @unique
-  email_hash String
-  expires_at DateTime
-  is_used    Boolean   @default(false)
-  used_at    DateTime?
-  created_at DateTime  @default(now())
-}
-
-// Pending OTP records. email_hash ensures no plaintext email is persisted.
-model PendingOTP {
-  id         String   @id @default(uuid())
-  email_hash String
-  otp_hash   String
-  expires_at DateTime
-  is_used    Boolean  @default(false)
-  created_at DateTime @default(now())
-}

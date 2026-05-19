@@ -95,12 +95,12 @@ export default function StructuredFields({ register, errors, watch }) {
           placeholder="e.g. I could not clearly hear everything that was said because I was some distance away, but I clearly saw..."
           {...register('uncertaintyStatement')}
         />
-        <div className="mt-3 flex gap-2 items-start bg-green-50 border border-green-200 p-3 rounded-lg shadow-sm">
+        <div className="mt-3 flex gap-2.5 items-start bg-green-50 border border-green-200 p-3 rounded-lg shadow-sm">
           <div className="w-5 h-5 bg-green-500 rounded-full mt-0.5 shrink-0 flex items-center justify-center">
             <span className="text-white text-xs font-bold font-serif italic">i</span>
           </div>
-          <p className="text-sm text-green-800 leading-relaxed">
-            <span className="font-semibold px-1">Note:</span> It is fine to be uncertain. Use this field if you want to add context.
+          <p className="text-xs sm:text-sm text-green-800 leading-relaxed">
+            <span className="font-semibold mr-1">Note:</span>It is fine to be uncertain. Use this field if you want to add context.
           </p>
         </div>
       </div>
