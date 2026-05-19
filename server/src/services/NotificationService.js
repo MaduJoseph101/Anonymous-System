@@ -41,7 +41,7 @@ const getCategoryEmail = (category) => {
 class NotificationService {
 
   static async notifyNewReport(report, category) {
-    // NEVER throw — notification failure must not affect report processing
+    // NEVER throw; notification failure must not affect report processing
     try {
       const recipientEmail = getCategoryEmail(category);
       if (!recipientEmail) {
@@ -59,7 +59,7 @@ class NotificationService {
       await transporter.sendMail({
         from: `"ASIRS Reporting System" <noreply@institution.edu>`,
         to: recipientEmail,
-        subject: `[${category.replace(/_/g, ' ')}] New Anonymous Report — ${tierLabel}`,
+        subject: `[${category.replace(/_/g, ' ')}] New Anonymous Report: ${tierLabel}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; 
             margin: 0 auto; padding: 20px;">
@@ -123,7 +123,7 @@ class NotificationService {
       });
 
     } catch (error) {
-      // Log but NEVER throw — notification failure is non-fatal
+      // Log but NEVER throw; notification failure is non-fatal
       console.error('[Notification] Email send error:', error.message);
     }
   }

@@ -9,11 +9,11 @@ export default function Home() {
   const faqs = [
     {
       question: "Will anyone know it was me?",
-      answer: "No. Your identity is not collected — not just promised to be kept private. No name, student ID, email, phone number, or IP address is stored or sent. Even system admins cannot identify you."
+      answer: "No. Your identity is not collected (not just promised to be kept private). No name, student ID, email, phone number, or IP address is stored or sent. Even system admins cannot identify you."
     },
     {
       question: "What kinds of things can I report?",
-      answer: "You can report anything that affects safety or wellbeing on campus — bullying, harassment, drug activity, sexual misconduct, staff malpractice, safety hazards, vandalism, academic fraud, mental health concerns about a peer, and more. No concern is too small."
+      answer: "You can report anything that affects safety or wellbeing on campus: bullying, harassment, drug activity, sexual misconduct, staff malpractice, safety hazards, vandalism, academic fraud, mental health concerns about a peer, and more. No concern is too small."
     },
     {
       question: "What happens after I submit?",
@@ -125,7 +125,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-bold mb-2 text-slate-800">3. Follow up</h3>
               <p className="text-slate-600 text-sm">
-                Check progress, read updates, and send replies — all without revealing who you are.
+                Check progress, read updates, and send replies, all without revealing who you are.
               </p>
             </div>
           </div>

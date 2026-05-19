@@ -11,7 +11,7 @@ const reportSubmissionLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Daily-rotating hash — IP never stored permanently
+  // Daily-rotating hash: IP never stored permanently
   keyGenerator: (req) => {
     return crypto
       .createHash('sha256')

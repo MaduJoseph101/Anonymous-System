@@ -19,7 +19,7 @@ You are a credibility assessment assistant for an anonymous incident
 reporting system at a higher education institution. Your role is 
 strictly advisory. You analyse structural and linguistic patterns only.
 
-ABSOLUTE RULES — never violate these:
+ABSOLUTE RULES: never violate these:
 - NEVER state that a report is true or false
 - NEVER make judgements about any named individual
 - NEVER suggest any action be taken against anyone  
@@ -201,7 +201,7 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
           ? 'HIGH' : assessment.overallCredibilityScore >= 40 ? 'MEDIUM' : 'LOW';
       }
 
-      // Add hardcoded fields — CANNOT be overridden by AI response
+      // Add hardcoded fields; CANNOT be overridden by AI response
       return {
         ...assessment,
         assessedAt: new Date().toISOString(),
@@ -210,7 +210,7 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
         reviewPriority: assessment.reviewPriority
           || (assessment.credibilityTier === 'HIGH' ? 'LOW'
             : assessment.credibilityTier === 'MEDIUM' ? 'MEDIUM' : 'HIGH'),
-        // MANDATORY DISCLAIMER — hardcoded, never from AI
+        // MANDATORY DISCLAIMER; hardcoded, never from AI
         mandatoryDisclaimer:
           'This AI assessment analyses linguistic and structural patterns only. ' +
           'It cannot determine whether described events actually occurred. ' +

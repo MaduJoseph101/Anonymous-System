@@ -27,7 +27,7 @@ router.post('/login',
       });
 
       // CRITICAL: Return IDENTICAL error for wrong email AND wrong password
-      // This prevents user enumeration — attacker cannot tell if 
+      // This prevents user enumeration; attacker cannot tell if 
       // the email exists in the system
       if (!admin || !admin.is_active) {
         return res.status(401).json({

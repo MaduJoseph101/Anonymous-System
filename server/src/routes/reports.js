@@ -14,6 +14,11 @@ const CompositeCredibilityService = require('../services/CompositeCredibilitySer
 const EscrowService = require('../services/EscrowService');
 const NotificationService = require('../services/NotificationService');
 
+const replaceEmDashes = (str) => {
+  if (typeof str !== 'string') return str;
+  return str.replace(/—/g, ' - ');
+};
+
 const uploadDir = path.join(process.cwd(), 'uploads', 'evidence');
 fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -77,6 +82,12 @@ router.post('/submit',
         verificationToken
       } = req.body;
 
+      const sanitizedDescription = replaceEmDashes(description);
+      const sanitizedLocation = replaceEmDashes(location);
+      const sanitizedLocationDescription = replaceEmDashes(locationDescription);
+      const sanitizedUncertaintyStatement = replaceEmDashes(uncertaintyStatement);
+      const sanitizedReporterContext = replaceEmDashes(reporterContext);
+
       const trackingCode = generateTrackingCode();
       const requiresEscrow = EscrowService.requiresEscrow(category);
 
@@ -84,17 +95,17 @@ router.post('/submit',
       const isStudentVerified = false;
       const verificationWarning = null;
 
-      // Create report — ALL sensitive fields encrypted before storage
+      // Create report: ALL sensitive fields encrypted before storage
       const report = await prisma.report.create({
         data: {
           tracking_code: trackingCode,
           retraction_code_hash: null,
           category,
-          description: encrypt(description),
-          location: encrypt(location),
-          location_description: locationDescription ? encrypt(locationDescription) : null,
-          uncertainty_statement: uncertaintyStatement ? encrypt(uncertaintyStatement) : null,
-          reporter_context: reporterContext ? encrypt(reporterContext) : null,
+          description: encrypt(sanitizedDescription),
+          location: encrypt(sanitizedLocation),
+          location_description: sanitizedLocationDescription ? encrypt(sanitizedLocationDescription) : null,
+          uncertainty_statement: sanitizedUncertaintyStatement ? encrypt(sanitizedUncertaintyStatement) : null,
+          reporter_context: sanitizedReporterContext ? encrypt(sanitizedReporterContext) : null,
           time_of_day: timeOfDay || null,
           status: requiresEscrow ? 'ESCROW' : 'RECEIVED',
           is_in_escrow: requiresEscrow,
@@ -133,18 +144,18 @@ router.post('/submit',
             'Save your tracking code to check progress and receive updates.'
       });
 
-      // ASYNC PROCESSING — runs after response sent to student
+      // ASYNC PROCESSING: runs after response sent to student
       setImmediate(async () => {
         try {
           // Plain text for AI analysis (never encrypted for Gemini)
           const reportForAnalysis = {
             id: report.id,
             category,
-            description,
-            location,
-            location_description: locationDescription,
-            uncertainty_statement: uncertaintyStatement,
-            reporter_context: reporterContext,
+            description: sanitizedDescription,
+            location: sanitizedLocation,
+            location_description: sanitizedLocationDescription,
+            uncertainty_statement: sanitizedUncertaintyStatement,
+            reporter_context: sanitizedReporterContext,
             time_of_day: timeOfDay,
             created_at: report.created_at
           };
@@ -184,7 +195,7 @@ router.post('/submit',
 
         } catch (asyncError) {
           console.error('[Async] Assessment pipeline error:', asyncError.message);
-          // Mark as failed but never propagate — report already saved
+          // Mark as failed but never propagate; report already saved
           await prisma.report.update({
             where: { id: report.id },
             data: { ai_analysis_status: 'FAILED' }
@@ -274,7 +285,7 @@ router.get('/track/:trackingCode', async (req, res, next) => {
   }
 });
 
-// POST /api/reports/reply — anonymous reporter sends follow-up
+// POST /api/reports/reply: anonymous reporter sends follow-up
 router.post('/reply',
   [
     body('trackingCode').notEmpty().withMessage('Tracking code required'),
@@ -307,11 +318,13 @@ router.post('/reply',
         });
       }
 
+      const sanitizedMessage = replaceEmDashes(message);
+
       await prisma.message.create({
         data: {
           report_id: report.id,
           sender_type: 'REPORTER',
-          content: encrypt(message)
+          content: encrypt(sanitizedMessage)
         }
       });
 
@@ -326,7 +339,7 @@ router.post('/reply',
   }
 );
 
-// POST /api/reports/retract — cancel report within escrow window
+// POST /api/reports/retract: cancel report within escrow window
 router.post('/retract',
   [
     body('trackingCode')

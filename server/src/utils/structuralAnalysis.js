@@ -10,7 +10,7 @@ const assessStructuralCredibility = (report) => {
 
   // POSITIVE ADJUSTMENTS
 
-  // Multi-sensory detail — genuine witnesses describe beyond visual
+  // Multi-sensory detail; genuine witnesses describe beyond visual
   const sensoryWords = [
     'heard', 'smell', 'smelled', 'felt', 'loud', 'quiet',
     'voice', 'shouting', 'whisper', 'cold', 'hot', 'crowded',
@@ -35,7 +35,7 @@ const assessStructuralCredibility = (report) => {
     });
   }
 
-  // Spontaneous uncertainty markers — genuine witnesses express doubt
+  // Spontaneous uncertainty markers; genuine witnesses express doubt
   const uncertaintyWords = [
     'actually', 'i think', 'not sure', 'i believe', 'maybe',
     'approximately', 'something like', 'i am not certain',
@@ -60,7 +60,7 @@ const assessStructuralCredibility = (report) => {
     });
   }
 
-  // Reporter context field completed — explains why they were present
+  // Reporter context field completed; explains why they were present
   if (report.reporter_context && report.reporter_context.length > 20) {
     score += 10;
     positiveIndicators.push(
@@ -79,7 +79,7 @@ const assessStructuralCredibility = (report) => {
     });
   }
 
-  // Uncertainty statement field completed — voluntary acknowledgement
+  // Uncertainty statement field completed; voluntary acknowledgement
   if (report.uncertainty_statement && report.uncertainty_statement.length > 10) {
     score += 10;
     positiveIndicators.push(
@@ -104,7 +104,7 @@ const assessStructuralCredibility = (report) => {
     positiveIndicators.push('Report contains sufficient descriptive detail');
   }
 
-  // Time of day uncertainty — "unsure" is a genuine honest answer
+  // Time of day uncertainty; "unsure" is a genuine honest answer
   if (report.time_of_day === 'unsure') {
     score += 5;
     positiveIndicators.push('Reporter acknowledged uncertainty about timing');
@@ -131,7 +131,7 @@ const assessStructuralCredibility = (report) => {
 
   // NEGATIVE ADJUSTMENTS
 
-  // Severe category with almost no detail — structurally suspicious
+  // Severe category with almost no detail; structurally suspicious
   const severeCategories = [
     'SEXUAL_HARASSMENT', 'STAFF_MISCONDUCT',
     'CULT_ACTIVITY', 'WEAPONS', 'GROOMING_CONCERN'
@@ -153,7 +153,7 @@ const assessStructuralCredibility = (report) => {
     );
   }
 
-  // Overly formal or legalistic language — inconsistent with natural student writing
+  // Overly formal or legalistic language; inconsistent with natural student writing
   const formalWords = [
     'aforementioned', 'henceforth', 'pursuant', 'hereby',
     'for the avoidance of doubt', 'it should be noted that',
@@ -166,7 +166,7 @@ const assessStructuralCredibility = (report) => {
     );
   }
 
-  // Claims total certainty — genuine witnesses almost always have some doubt
+  // Claims total certainty; genuine witnesses almost always have some doubt
   if (report.uncertainty_statement) {
     const totalCertaintyPhrases = [
       'nothing', 'certain about everything',
@@ -178,7 +178,7 @@ const assessStructuralCredibility = (report) => {
     )) {
       score -= 10;
       concernIndicators.push(
-        'Claims complete certainty — genuine eyewitnesses almost always have some uncertainty'
+        'Claims complete certainty; genuine eyewitnesses almost always have some uncertainty'
       );
     }
   }

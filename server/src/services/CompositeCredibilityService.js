@@ -6,7 +6,7 @@ const { assessStructuralCredibility } = require('../utils/structuralAnalysis');
 class CompositeCredibilityService {
 
   static async generateComposite(report) {
-    // Run all methods in parallel — allSettled ensures one failure
+    // Run all methods in parallel; allSettled ensures one failure
     // does not prevent others from contributing to the composite
     const [geminiResult, statisticalResult, structuralResult, similarityResult] =
       await Promise.allSettled([
@@ -29,7 +29,7 @@ class CompositeCredibilityService {
     let compositeScore = 50;
     const signals = [];
 
-    // Gemini AI — 40% weight
+    // Gemini AI: 40% weight
     if (gemini && !gemini.error && gemini.overallCredibilityScore !== null) {
       const contribution = (gemini.overallCredibilityScore - 50) * 0.40;
       compositeScore += contribution;
@@ -42,7 +42,7 @@ class CompositeCredibilityService {
       });
     }
 
-    // Structural Analysis — 35% weight
+    // Structural Analysis: 35% weight
     if (structural) {
       const contribution = (structural.score - 50) * 0.35;
       compositeScore += contribution;
@@ -55,7 +55,7 @@ class CompositeCredibilityService {
       });
     }
 
-    // Statistical Detection — 25% weight
+    // Statistical Detection: 25% weight
     if (statistical) {
       const statPenalty = statistical.anomalies.reduce((total, anomaly) => {
         return total + (
@@ -75,7 +75,7 @@ class CompositeCredibilityService {
       });
     }
 
-    // Similarity — supplementary context only (no weight in composite)
+    // Similarity: supplementary context only (no weight in composite)
     if (similarity && similarity.hasSuspiciousPattern) {
       compositeScore -= 5; // Minor penalty for suspicious similarity
     }
@@ -113,7 +113,7 @@ class CompositeCredibilityService {
       recommendedAction,
       overallSummary,
       forensicConclusion: `${finalTier} review priority. ${recommendedAction}`,
-      // MANDATORY DISCLAIMER — always present in every composite output
+      // MANDATORY DISCLAIMER: always present in every composite output
       mandatoryDisclaimer:
         'This composite assessment is strictly advisory. It analyses patterns, ' +
         'not facts. It cannot determine whether described events occurred. ' +

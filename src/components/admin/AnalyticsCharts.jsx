@@ -193,7 +193,7 @@ export const CategoryBarChart = ({ data = [] }) => {
       )}
 
       {formattedData.length === 0 ? (
-        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACED</div>
+        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACTED</div>
       ) : (
         <ResponsiveContainer>
           <BarChart 
@@ -301,7 +301,7 @@ export const StatusPieChart = ({ data = [] }) => {
       })()}
 
       {data.length === 0 ? (
-        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACED</div>
+        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACTED</div>
       ) : (
         <ResponsiveContainer>
           <PieChart>
@@ -354,7 +354,7 @@ export const TierPieChart = ({ data = [] }) => {
       })()}
 
       {data.length === 0 ? (
-        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACED</div>
+        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACTED</div>
       ) : (
         <ResponsiveContainer>
           <PieChart>
@@ -428,7 +428,7 @@ export const DailyTrendLine = ({ data = [] }) => {
       })()}
 
       {detailedData.length === 0 ? (
-        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACED</div>
+        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACTED</div>
       ) : (
         <ResponsiveContainer>
           <LineChart data={detailedData} margin={{ top: 15, right: 10, left: -20, bottom: 5 }}>

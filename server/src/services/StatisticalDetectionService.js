@@ -9,7 +9,7 @@ class StatisticalDetectionService {
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // CHECK 1 — Target Concentration
+    // CHECK 1: Target Concentration
     // Multiple reports naming the same individual in a short window
     const fullNamePattern = /\b[A-Z][a-z]+ [A-Z][a-z]+\b/g;
     const namesInReport = (report.description || '').match(fullNamePattern) || [];
@@ -37,7 +37,7 @@ class StatisticalDetectionService {
             severity: targetCount >= 4 ? 'HIGH' : 'MEDIUM',
             detail: `"${name}" appears in ${targetCount + 1} reports in the ` +
               `past 7 days. May indicate coordinated targeting or a genuine ` +
-              `pattern of behaviour — verify independently.`
+              `pattern of behaviour; verify independently.`
           });
         }
       } catch (err) {
@@ -45,7 +45,7 @@ class StatisticalDetectionService {
       }
     }
 
-    // CHECK 2 — Insufficient Detail for Severity
+    // CHECK 2: Insufficient Detail for Severity
     const wordCount = (report.description || '')
       .split(/\s+/).filter(w => w.length > 0).length;
     const severeCategories = [
@@ -61,18 +61,18 @@ class StatisticalDetectionService {
       });
     }
 
-    // CHECK 3 — Unusual Submission Timing (weak signal only)
+    // CHECK 3: Unusual Submission Timing (weak signal only)
     const hour = now.getHours();
     if (hour >= 2 && hour <= 4) {
       anomalies.push({
         type: 'UNUSUAL_SUBMISSION_TIME',
         severity: 'LOW',
-        detail: 'Submitted between 2am and 4am. Weak signal only — ' +
+        detail: 'Submitted between 2am and 4am. Weak signal only; ' +
           'genuine reporters sometimes submit at unusual hours when they feel safest.'
       });
     }
 
-    // CHECK 4 — Category-Specific Volume
+    // CHECK 4: Category-Specific Volume
     try {
       const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
       const recentSameCategory = await prisma.report.count({

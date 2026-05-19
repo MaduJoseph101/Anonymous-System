@@ -58,7 +58,7 @@ app.use('/api', (req, res, next) => {
 
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// ── Health check — no auth required ──────────────────────────────────────────
+// ── Health check: no auth required ──────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',

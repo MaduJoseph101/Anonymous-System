@@ -44,7 +44,7 @@ export default function SubmitReport() {
   const selectedMedia = watch('media')?.[0] || null;
   const requiresCooling = selectedCategory ? HIGH_STAKES_CATEGORIES.includes(selectedCategory) : false;
 
-  // All asterisk-marked fields must be filled — uncertainty is intentionally excluded
+  // All asterisk-marked fields must be filled; uncertainty is intentionally excluded
   const canAcknowledge =
     !!selectedCategory &&
     locationValue.length >= 3 &&

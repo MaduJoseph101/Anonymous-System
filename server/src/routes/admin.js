@@ -243,7 +243,7 @@ router.get('/reports', async (req, res, next) => {
       });
     }
 
-    // Build where clause — exclude 'ESCROW' reports entirely from dashboard lists
+    // Build where clause: exclude 'ESCROW' reports entirely from dashboard lists
     const where = {
       category: { in: accessibleCategories },
       ...(compositeTier && { composite_tier: compositeTier }),
@@ -306,7 +306,7 @@ router.get('/reports', async (req, res, next) => {
   }
 });
 
-// GET /api/admin/reports/:id — full report detail
+// GET /api/admin/reports/:id: full report detail
 router.get('/reports/:id', async (req, res, next) => {
   try {
     const report = await prisma.report.findUnique({
@@ -381,7 +381,7 @@ router.patch('/reports/:id/status',
     try {
       const { status, corroborationNote } = req.body;
 
-      // CORROBORATION DOCTRINE — server-side enforcement
+      // CORROBORATION DOCTRINE: server-side enforcement
       // This check exists at the API handler level and CANNOT be bypassed
       // from the frontend or through direct API calls
       if (status === 'ACTION_TAKEN') {
@@ -543,7 +543,7 @@ router.patch('/reports/:id/outcome',
   }
 );
 
-// Admin user management routes — SUPER_ADMIN only
+// Admin user management routes: SUPER_ADMIN only
 
 router.get('/users', requireRole('SUPER_ADMIN'), async (req, res, next) => {
   try {
@@ -615,7 +615,7 @@ router.patch('/users/:id', requireRole('SUPER_ADMIN'), async (req, res, next) =>
   } catch (error) { next(error); }
 });
 
-// POST /api/admin/users/:id/reset-password — SUPER_ADMIN only
+// POST /api/admin/users/:id/reset-password: SUPER_ADMIN only
 // Generates a secure temporary password, stores its hash, returns it ONCE.
 router.post('/users/:id/reset-password', requireRole('SUPER_ADMIN'), async (req, res, next) => {
   try {
@@ -644,7 +644,7 @@ router.post('/users/:id/reset-password', requireRole('SUPER_ADMIN'), async (req,
     return res.status(200).json({
       success: true,
       temporaryPassword,
-      message: 'Temporary password generated. Share it securely with the user — it is shown only once.'
+      message: 'Temporary password generated. Share it securely with the user; it is shown only once.'
     });
   } catch (error) { next(error); }
 });

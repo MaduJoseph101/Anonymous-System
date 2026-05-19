@@ -32,7 +32,7 @@ model Report {
   escrow_release_at      DateTime?
   is_student_verified    Boolean        @default(false)
   verification_method    String?
-  // AI credibility signals — all derived, never PII
+  // AI credibility signals: all derived, never PII
   ai_credibility_score   Int?
   ai_credibility_tier    String?
   ai_assessment_json     String?
