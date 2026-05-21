@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  PieChart, Pie, Cell, LineChart, Line, Legend 
+  PieChart, Pie, Cell, LineChart, Line, Legend, ComposedChart, Area 
 } from 'recharts';
 import { formatCategory } from '../../utils/formatters';
 
@@ -83,7 +83,7 @@ const CustomLegend = ({ payload, formatLabel, colors, activeTag, onActiveTagChan
               style={{ backgroundColor: color }} 
             />
             <span className="tracking-wide uppercase">
-              {label} {isClicked && `(${count})`}
+              {label}
             </span>
           </button>
         );
@@ -137,7 +137,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     // For CategoryBarChart, show ONLY the metric count in a clean non-breaking circular/pill container
     if (dataPoint.payload?.category) {
       return (
-        <div className="bg-indigo-600 text-white font-extrabold text-xs px-3 py-1 rounded-lg shadow-lg border border-indigo-700 whitespace-nowrap flex items-center justify-center min-w-[36px] text-center">
+        <div className="bg-indigo-600 text-white font-extrabold text-xs px-3 py-1 rounded-lg shadow-lg border border-indigo-700 whitespace-nowrap flex items-center justify-center min-w-[36px] text-center transition-all duration-300">
           {dataPoint.value}
         </div>
       );
@@ -179,16 +179,13 @@ export const CategoryBarChart = ({ data = [] }) => {
   return (
     <div className="relative" style={{ width: '100%', height: 350 }}>
       {activeItem && (
-        <div className="absolute top-0 left-0 right-0 mx-auto w-[90%] sm:w-fit min-w-[220px] bg-white/95 backdrop-blur-md border border-slate-200/80 px-4 py-2 rounded-xl shadow-lg flex items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-300 z-20">
+        <div className="absolute -top-3 left-0 right-0 mx-auto w-[90%] sm:w-fit min-w-[220px] bg-white/95 backdrop-blur-md border border-slate-200/80 px-4 py-2 rounded-xl shadow-lg flex items-center justify-center animate-in slide-in-from-top-2 duration-300 z-20 pointer-events-none">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/5 bg-indigo-500" />
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 whitespace-nowrap">
-              {activeItem.label.length > 20 ? activeItem.label.slice(0, 17) + '...' : activeItem.label}
+            <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/5 bg-indigo-500 transition-colors duration-300" />
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-700 transition-all duration-300 text-center">
+              {activeItem.label}
             </span>
           </div>
-          <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 whitespace-nowrap">
-            {activeItem.count || 0} reports
-          </span>
         </div>
       )}
 
@@ -199,9 +196,13 @@ export const CategoryBarChart = ({ data = [] }) => {
           <BarChart 
             data={formattedData} 
             layout="vertical" 
-            margin={{ top: 15, right: 30, left: 10, bottom: 5 }}
+            margin={{ top: 40, right: 30, left: 10, bottom: 5 }}
             onClick={(state) => {
-              if (state && state.activeTooltipIndex !== undefined) {
+              if (state && state.activePayload && state.activePayload.length > 0) {
+                const clickedLabel = state.activePayload[0].payload.label;
+                const idx = formattedData.findIndex(d => d.label === clickedLabel);
+                if (idx !== -1) setActiveIndex(idx);
+              } else if (state && state.activeTooltipIndex !== undefined) {
                 setActiveIndex(state.activeTooltipIndex);
               }
             }}
@@ -224,7 +225,12 @@ export const CategoryBarChart = ({ data = [] }) => {
                   : (payload.value.length > 22 ? payload.value.slice(0, 19) + '...' : payload.value);
                 
                 return (
-                  <g transform={`translate(${x},${y})`}>
+                  <g 
+                    transform={`translate(${x},${y})`} 
+                    className="cursor-pointer" 
+                    onClick={(e) => { e.stopPropagation(); setActiveIndex(index); }}
+                  >
+                    <rect x={-(isMobile ? 80 : 130)} y={-15} width={isMobile ? 80 : 130} height={30} fill="transparent" />
                     <text
                       x={-6}
                       y={3}
@@ -232,8 +238,7 @@ export const CategoryBarChart = ({ data = [] }) => {
                       fill={isActive ? '#4f46e5' : '#64748b'}
                       fontWeight={isActive ? 900 : 600}
                       fontSize={isMobile ? 8 : 9}
-                      className="transition-all duration-200 cursor-pointer select-none"
-                      onClick={() => setActiveIndex(index)}
+                      className="transition-all duration-300 select-none"
                     >
                       {truncatedText}
                     </text>
@@ -243,7 +248,7 @@ export const CategoryBarChart = ({ data = [] }) => {
             />
             <Tooltip 
               content={<CustomTooltip />} 
-              cursor={{fill: '#f8fafc'}} 
+              cursor={{fill: '#f8fafc', cursor: 'pointer'}} 
               allowEscapeViewBox={{ x: true, y: true }}
               wrapperStyle={{ 
                 transition: 'transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)',
@@ -254,6 +259,24 @@ export const CategoryBarChart = ({ data = [] }) => {
               dataKey="count" 
               radius={[0, 6, 6, 0]} 
               barSize={20}
+              className="cursor-pointer"
+              background={(props) => {
+                const { x, y, width, height, index } = props;
+                const isActive = activeIndex === index;
+                const offset = isMobile ? 80 : 130;
+                return (
+                  <rect 
+                    x={x - offset - 10} 
+                    y={y - 6} 
+                    width={width + offset + 20} 
+                    height={height + 12} 
+                    fill="transparent"
+                    rx={6}
+                    onClick={(e) => { e.stopPropagation(); setActiveIndex(index); }}
+                    className="cursor-pointer transition-colors duration-300"
+                  />
+                );
+              }}
             >
               {formattedData.map((entry, index) => {
                 const isActive = activeIndex === index;
@@ -261,9 +284,9 @@ export const CategoryBarChart = ({ data = [] }) => {
                   <Cell 
                     key={`cell-${index}`} 
                     fill={isActive ? '#4f46e5' : '#e2e8f0'}
+                    onClick={(e) => { e.stopPropagation(); setActiveIndex(index); }}
                     style={{
-                      cursor: 'pointer',
-                      filter: isActive ? 'drop-shadow(0px 2px 4px rgba(79, 70, 229, 0.4))' : 'none'
+                      transition: 'all 0.3s ease'
                     }}
                   />
                 );
@@ -283,19 +306,22 @@ export const StatusPieChart = ({ data = [] }) => {
     <div className="relative" style={{ width: '100%', height: 350 }}>
       {activeTag && (() => {
         const item = data.find(d => d.status === activeTag);
-        const count = item ? item.count : 0;
+        if (!item) return null;
         const color = STATUS_COLORS[activeTag] || '#cbd5e1';
         const label = formatStatusLabel(activeTag);
         
         return (
-          <div className="absolute top-0 left-0 right-0 mx-auto w-[90%] sm:w-fit min-w-[200px] bg-white/95 backdrop-blur-md border border-slate-200/80 px-4 py-2 rounded-xl shadow-lg flex items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-300 z-20">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/5" style={{ backgroundColor: color }} />
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 whitespace-nowrap">{label}</span>
-            </div>
-            <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 whitespace-nowrap">
-              {count} reports
-            </span>
+          <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+            <CustomTooltip 
+              active={true} 
+              payload={[{
+                name: label,
+                value: item.count,
+                color: color,
+                payload: item
+              }]} 
+              label={label} 
+            />
           </div>
         );
       })()}
@@ -316,11 +342,23 @@ export const StatusPieChart = ({ data = [] }) => {
               nameKey="status"
               stroke="none"
             >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.status] || '#cbd5e1'} />
-              ))}
+              {data.map((entry, index) => {
+                const isFaded = activeTag && entry.status !== activeTag;
+                return (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={STATUS_COLORS[entry.status] || '#cbd5e1'} 
+                    style={{
+                      transition: 'all 0.3s ease',
+                      opacity: isFaded ? 0.3 : 1,
+                      filter: (activeTag === entry.status) ? 'drop-shadow(0px 4px 6px rgba(0,0,0,0.15))' : 'none',
+                      cursor: 'pointer'
+                    }}
+                  />
+                );
+              })}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            {!activeTag && <Tooltip content={<CustomTooltip />} />}
             <Legend content={<CustomLegend formatLabel={formatStatusLabel} colors={STATUS_COLORS} activeTag={activeTag} onActiveTagChange={setActiveTag} />} />
           </PieChart>
         </ResponsiveContainer>
@@ -336,19 +374,22 @@ export const TierPieChart = ({ data = [] }) => {
     <div className="relative" style={{ width: '100%', height: 350 }}>
       {activeTag && (() => {
         const item = data.find(d => d.tier === activeTag);
-        const count = item ? item.count : 0;
+        if (!item) return null;
         const color = TIER_COLORS[activeTag] || '#cbd5e1';
         const label = formatTierLabel(activeTag);
         
         return (
-          <div className="absolute top-0 left-0 right-0 mx-auto w-[90%] sm:w-fit min-w-[200px] bg-white/95 backdrop-blur-md border border-slate-200/80 px-4 py-2 rounded-xl shadow-lg flex items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-300 z-20">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/5" style={{ backgroundColor: color }} />
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 whitespace-nowrap">{label}</span>
-            </div>
-            <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 whitespace-nowrap">
-              {count} reports
-            </span>
+          <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+            <CustomTooltip 
+              active={true} 
+              payload={[{
+                name: label,
+                value: item.count,
+                color: color,
+                payload: item
+              }]} 
+              label={label} 
+            />
           </div>
         );
       })()}
@@ -362,16 +403,30 @@ export const TierPieChart = ({ data = [] }) => {
               data={data}
               cx="50%"
               cy="45%"
+              innerRadius={70}
               outerRadius={100}
+              paddingAngle={4}
               dataKey="count"
               nameKey="tier"
               stroke="none"
             >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={TIER_COLORS[entry.tier] || '#94a3b8'} />
-              ))}
+              {data.map((entry, index) => {
+                const isFaded = activeTag && entry.tier !== activeTag;
+                return (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={TIER_COLORS[entry.tier] || '#94a3b8'} 
+                    style={{
+                      transition: 'all 0.3s ease',
+                      opacity: isFaded ? 0.3 : 1,
+                      filter: (activeTag === entry.tier) ? 'drop-shadow(0px 4px 6px rgba(0,0,0,0.15))' : 'none',
+                      cursor: 'pointer'
+                    }}
+                  />
+                );
+              })}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            {!activeTag && <Tooltip content={<CustomTooltip />} />}
             <Legend content={<CustomLegend formatLabel={formatTierLabel} colors={TIER_COLORS} activeTag={activeTag} onActiveTagChange={setActiveTag} />} />
           </PieChart>
         </ResponsiveContainer>
@@ -407,7 +462,7 @@ export const DailyTrendLine = ({ data = [] }) => {
   });
 
   return (
-    <div className="relative" style={{ width: '100%', height: 300 }}>
+    <div className="relative" style={{ width: '100%', height: 350 }}>
       {activeTag && (() => {
         const latestData = detailedData[detailedData.length - 1];
         const val = latestData ? latestData[activeTag] : 0;
@@ -415,14 +470,17 @@ export const DailyTrendLine = ({ data = [] }) => {
         const label = activeTag === 'count' ? 'Daily Count' : activeTag === 'rollingAvg' ? '3-Day Average' : 'Cumulative Total';
         
         return (
-          <div className="absolute top-0 left-0 right-0 mx-auto w-[90%] sm:w-fit min-w-[200px] bg-white/95 backdrop-blur-md border border-slate-200/80 px-4 py-2 rounded-xl shadow-lg flex items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-300 z-20">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/5" style={{ backgroundColor: color }} />
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 whitespace-nowrap">{label} (Latest)</span>
-            </div>
-            <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 whitespace-nowrap">
-              {val} {activeTag === 'rollingAvg' ? 'avg' : 'reports'}
-            </span>
+          <div className="absolute top-0 left-[50%] -translate-x-1/2 z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+            <CustomTooltip 
+              active={true} 
+              payload={[{
+                name: label,
+                value: val,
+                color: color,
+                payload: latestData
+              }]} 
+              label={`${label} (Latest)`} 
+            />
           </div>
         );
       })()}
@@ -431,18 +489,58 @@ export const DailyTrendLine = ({ data = [] }) => {
         <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACTED</div>
       ) : (
         <ResponsiveContainer>
-          <LineChart data={detailedData} margin={{ top: 15, right: 10, left: -20, bottom: 5 }}>
+          <ComposedChart data={detailedData} margin={{ top: 75, right: 10, left: -20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
             <XAxis dataKey="date" fontSize={10} tickLine={false} axisLine={false} padding={{ left: 20, right: 20 }} fontWeight={800} stroke="#94a3b8" />
             <YAxis yAxisId="left" allowDecimals={false} fontSize={11} tickLine={false} axisLine={false} fontWeight={800} stroke="#6366f1" />
             <YAxis yAxisId="right" orientation="right" allowDecimals={false} fontSize={11} tickLine={false} axisLine={false} fontWeight={800} stroke="#10b981" />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 2, strokeDasharray: '3 3' }} />
+            
+            {!activeTag && <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} position={{ y: 0 }} />}
             <Legend content={<CustomLegend formatLabel={(val) => val === 'count' ? 'Daily Count' : val === 'rollingAvg' ? '3-Day Average' : 'Cumulative Total'} colors={{ count: '#6366f1', rollingAvg: '#8b5cf6', cumulative: '#10b981' }} activeTag={activeTag} onActiveTagChange={setActiveTag} />} />
             
-            <Line yAxisId="left" type="monotone" name="count" dataKey="count" stroke="#6366f1" strokeWidth={3.5} dot={{ r: 4, strokeWidth: 2.5, fill: '#fff' }} activeDot={{ r: 6, fill: '#6366f1', stroke: '#fff', strokeWidth: 2.5 }} animationDuration={1000} />
-            <Line yAxisId="left" type="monotone" name="rollingAvg" dataKey="rollingAvg" stroke="#8b5cf6" strokeWidth={2} strokeDasharray="5 5" dot={false} activeDot={{ r: 4, fill: '#8b5cf6', stroke: '#fff', strokeWidth: 2 }} animationDuration={1000} />
-            <Line yAxisId="right" type="monotone" name="cumulative" dataKey="cumulative" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2.5, fill: '#fff' }} activeDot={{ r: 6, fill: '#10b981', stroke: '#fff', strokeWidth: 2.5 }} animationDuration={1000} />
-          </LineChart>
+            <Area 
+              yAxisId="right" 
+              type="monotone" 
+              name="cumulative" 
+              dataKey="cumulative" 
+              fill="#d1fae5" 
+              stroke="#10b981" 
+              strokeWidth={2}
+              style={{
+                transition: 'all 0.3s ease',
+                opacity: (activeTag && activeTag !== 'cumulative') ? 0.2 : 1,
+                cursor: 'pointer'
+              }}
+            />
+            <Bar 
+              yAxisId="left" 
+              name="count" 
+              dataKey="count" 
+              fill="#818cf8" 
+              radius={[4, 4, 0, 0]} 
+              barSize={20}
+              style={{
+                transition: 'all 0.3s ease',
+                opacity: (activeTag && activeTag !== 'count') ? 0.2 : 1,
+                cursor: 'pointer'
+              }}
+            />
+            <Line 
+              yAxisId="left" 
+              type="monotone" 
+              name="rollingAvg" 
+              dataKey="rollingAvg" 
+              stroke="#4f46e5" 
+              strokeWidth={3} 
+              dot={false} 
+              activeDot={{ r: 6, fill: '#4f46e5', stroke: '#fff', strokeWidth: 2 }} 
+              style={{
+                transition: 'all 0.3s ease',
+                opacity: (activeTag && activeTag !== 'rollingAvg') ? 0.2 : 1,
+                cursor: 'pointer'
+              }}
+            />
+          </ComposedChart>
         </ResponsiveContainer>
       )}
     </div>

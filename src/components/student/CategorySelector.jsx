@@ -16,7 +16,7 @@ export default function CategorySelector({ register, errors, watch }) {
         <div className="relative">
           <select
             id="category"
-            className={`block w-full px-4 py-3 rounded-xl border ${errors.category ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+            className={`block w-full px-4 py-3 pr-10 truncate rounded-xl border ${errors.category ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
             {...register('category', { required: 'Please select a category' })}
           >
             <option value="">Select a category</option>

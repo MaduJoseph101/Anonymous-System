@@ -112,6 +112,10 @@ const normalizeReportDetail = (report, rtcReputation, structuralDetail) => {
   const reporterLocationDescription = decrypt(report.location_description);
   const reporterUncertaintyStatement = decrypt(report.uncertainty_statement);
   const reporterContext = decrypt(report.reporter_context);
+  const patternObservation = decrypt(report.pattern_observation);
+  const witnessPresence = decrypt(report.witness_presence);
+  const immediateAction = decrypt(report.immediate_action);
+  const ongoingStatus = decrypt(report.ongoing_status);
   const cbcaObservations = aiAssessment?.cbcaStyleObservations || structuralDetail?.cbcaCriteria || [];
 
   const reviewPriority = aiAssessment?.reviewPriority
@@ -140,6 +144,10 @@ const normalizeReportDetail = (report, rtcReputation, structuralDetail) => {
     uncertaintyStatement: reporterUncertaintyStatement,
     reporter_context: reporterContext,
     reporterContext,
+    patternObservation,
+    witnessPresence,
+    immediateAction,
+    ongoingStatus,
     time_of_day: report.time_of_day,
     timeOfDay: report.time_of_day,
     compositeScore: report.composite_score,
@@ -187,6 +195,10 @@ const normalizeReportDetail = (report, rtcReputation, structuralDetail) => {
       locationDescription: reporterLocationDescription,
       uncertaintyStatement: reporterUncertaintyStatement,
       reporterContext,
+      patternObservation,
+      witnessPresence,
+      immediateAction,
+      ongoingStatus,
       timeOfDay: report.time_of_day,
       isStudentVerified: report.is_student_verified,
       verificationMethod: report.verification_method,
@@ -348,6 +360,10 @@ router.get('/reports/:id', async (req, res, next) => {
       location_description: decrypt(report.location_description),
       uncertainty_statement: decrypt(report.uncertainty_statement),
       reporter_context: decrypt(report.reporter_context),
+      pattern_observation: decrypt(report.pattern_observation),
+      witness_presence: decrypt(report.witness_presence),
+      immediate_action: decrypt(report.immediate_action),
+      ongoing_status: decrypt(report.ongoing_status),
       time_of_day: report.time_of_day
     };
 

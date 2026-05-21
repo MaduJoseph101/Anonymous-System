@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/shared/ProtectedRoute';
+import CaptchaWrapper from './components/shared/CaptchaWrapper';
 
 import AdminLayout from './layouts/AdminLayout';
 import Home from './pages/student/Home';
@@ -39,11 +40,14 @@ function App() {
           }}
         />
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/submit" element={<SubmitReport />} />
-          <Route path="/track" element={<TrackReport />} />
-          <Route path="/track/messages" element={<TrackMessages />} />
-          <Route path="/retract" element={<RetractReport />} />
+          <Route element={<CaptchaWrapper />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/submit" element={<SubmitReport />} />
+            <Route path="/track" element={<TrackReport />} />
+            <Route path="/track/messages" element={<TrackMessages />} />
+            <Route path="/retract" element={<RetractReport />} />
+          </Route>
+          
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
 

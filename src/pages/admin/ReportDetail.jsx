@@ -47,6 +47,21 @@ export default function ReportDetail() {
     fetchReport();
   }, [fetchReport]);
 
+  // Poll for updates if the AI assessment is still pending
+  useEffect(() => {
+    let intervalId;
+    if (report?.aiAnalysisStatus === 'PENDING') {
+      intervalId = setInterval(() => {
+        fetchReport();
+      }, 5000); // Poll every 5 seconds
+    }
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [report?.aiAnalysisStatus, fetchReport]);
+
   const handleStatusUpdated = () => {
     fetchReport(); // Re-fetch to get new status and audit logs
   };
@@ -275,6 +290,10 @@ export default function ReportDetail() {
               { label: 'Location Note', value: report.locationDescription || report.location_description || 'Not provided' },
               { label: 'Time', value: report.timeOfDay || report.time_of_day || 'Not provided' },
               { label: 'Reporter Note', value: report.reporterContext || report.reporter_context || 'Not provided' },
+              { label: 'Pattern Observation', value: report.patternObservation || report.pattern_observation || 'Not provided' },
+              { label: 'Witnesses Present', value: report.witnessPresence || report.witness_presence || 'Not provided' },
+              { label: 'Immediate Action', value: report.immediateAction || report.immediate_action || 'Not provided' },
+              { label: 'Ongoing Status', value: report.ongoingStatus || report.ongoing_status || 'Not provided' },
               { label: 'Verification', value: report.verificationMethod || report.verification_method || 'Not used' }
             ].map((field) => (
               <div key={field.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4">

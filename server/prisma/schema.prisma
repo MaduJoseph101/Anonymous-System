@@ -25,6 +25,10 @@ model Report {
   uncertainty_statement  String?
   reporter_context       String?
   time_of_day            String?
+  pattern_observation    String?
+  witness_presence       String?
+  immediate_action       String?
+  ongoing_status         String?
   status                 ReportStatus   @default(RECEIVED)
   priority               Priority       @default(NORMAL)
   assigned_to            String?

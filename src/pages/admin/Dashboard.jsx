@@ -121,12 +121,12 @@ export default function Dashboard() {
 
         {/* Sticky Notice for Low Credibility */}
         {hasLowCredibility && (
-          <div className="bg-amber-50 border-l-4 border-l-amber-500 border-t border-b border-r border-amber-200 rounded-r-xl rounded-l-sm p-4 mb-8 shadow-sm flex gap-3 animate-in fade-in slide-in-from-top-2 relative overflow-hidden">
+          <div className="bg-amber-50 border-l-4 border-l-amber-500 border-t border-b border-r border-amber-200 rounded-r-xl rounded-l-sm p-4 mb-8 shadow-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/40 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-            <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5 z-10" />
-            <div className="z-10">
-              <p className="text-amber-900 font-medium text-sm leading-relaxed max-w-4xl">
-                <strong className="font-extrabold text-amber-950">{lowCredibilityCount} report(s)</strong> have been flagged for elevated scrutiny. These appear in the table with an amber indicator and are marked with ⚠ in the AI Tier column. Apply additional corroboration caution before initiating any action on these reports.
+            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5 z-10" />
+            <div className="z-10 flex-1">
+              <p className="text-amber-900 font-medium text-sm leading-relaxed max-w-4xl text-justify">
+                <strong className="font-extrabold text-amber-950">{lowCredibilityCount} report(s)</strong> flagged for extra scrutiny. Please ensure thorough corroboration before taking any action on these reports.
               </p>
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function Dashboard() {
             <select 
               value={statusFilter}
               onChange={(e) => updateFilters('status', e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 outline-none font-bold whitespace-nowrap min-w-[150px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
+              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 pr-10 truncate outline-none font-bold whitespace-nowrap min-w-[150px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
             >
               <option value="">All Statuses</option>
               {Object.keys(STATUS_CONFIG).map(s => (
@@ -178,7 +178,7 @@ export default function Dashboard() {
             <select 
               value={tierFilter}
               onChange={(e) => updateFilters('tier', e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 outline-none font-bold whitespace-nowrap min-w-[150px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
+              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 pr-10 truncate outline-none font-bold whitespace-nowrap min-w-[150px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
             >
               <option value="">All Credibility Tiers</option>
               {Object.keys(CREDIBILITY_TIER_CONFIG).map(t => (
@@ -189,7 +189,7 @@ export default function Dashboard() {
             <select 
               value={categoryFilter}
               onChange={(e) => updateFilters('category', e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 outline-none font-bold whitespace-nowrap min-w-[200px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
+              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 pr-10 truncate outline-none font-bold whitespace-nowrap min-w-[200px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
             >
               <option value="">All Categories</option>
               {REPORT_CATEGORIES.map(c => (

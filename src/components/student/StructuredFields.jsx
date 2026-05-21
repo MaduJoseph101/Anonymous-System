@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
-export default function StructuredFields({ register, errors, watch }) {
+export default function StructuredFields({ register, errors, watch, setValue }) {
   const description = watch('description') || '';
   const descLength = description.length;
   const selectedMedia = watch('media')?.[0] || null;
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  useEffect(() => {
+    if (!selectedMedia) {
+      setPreviewUrl(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(selectedMedia);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [selectedMedia]);
   
   return (
     <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 space-y-6">
@@ -55,7 +67,7 @@ export default function StructuredFields({ register, errors, watch }) {
         </label>
         <select
           id="timeOfDay"
-          className={`block w-full px-4 py-3 rounded-xl border ${errors.timeOfDay ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          className={`block w-full px-4 py-3 pr-10 truncate rounded-xl border ${errors.timeOfDay ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
           {...register('timeOfDay', { required: 'Please select an approximate time' })}
         >
           <option value="">Select a time period</option>
@@ -82,6 +94,78 @@ export default function StructuredFields({ register, errors, watch }) {
         />
         {errors.reporterContext && <p className="mt-1 text-sm text-red-600">{errors.reporterContext.message}</p>}
         <p className="mt-2 text-xs text-slate-500">This helps explain how you saw it.</p>
+      </div>
+
+      <div>
+        <label htmlFor="patternObservation" className="block text-sm font-medium text-slate-800 mb-2">
+          Was this a single isolated incident or part of a pattern you have observed? (Optional)
+        </label>
+        <select
+          id="patternObservation"
+          className="block w-full px-4 py-3 pr-10 truncate rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors"
+          {...register('patternObservation')}
+        >
+          <option value="">Select an option</option>
+          <option value="This appears to be a single isolated incident">This appears to be a single isolated incident</option>
+          <option value="I believe this is part of a recurring pattern">I believe this is part of a recurring pattern</option>
+          <option value="I have witnessed similar incidents involving the same people before">I have witnessed similar incidents involving the same people before</option>
+          <option value="I am not certain whether this is isolated or recurring">I am not certain whether this is isolated or recurring</option>
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="witnessPresence" className="block text-sm font-medium text-slate-800 mb-2">
+          At the time of the incident, was anyone else present who may also have witnessed it? <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="witnessPresence"
+          className={`block w-full px-4 py-3 pr-10 truncate rounded-xl border ${errors.witnessPresence ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          {...register('witnessPresence', { required: 'Please select an option' })}
+        >
+          <option value="">Select an option</option>
+          <option value="Yes, there were other people nearby who likely witnessed it">Yes, there were other people nearby who likely witnessed it</option>
+          <option value="I was the only person who appeared to notice">I was the only person who appeared to notice</option>
+          <option value="I am not certain whether others witnessed it">I am not certain whether others witnessed it</option>
+          <option value="I would rather not say">I would rather not say</option>
+        </select>
+        {errors.witnessPresence && <p className="mt-1 text-sm text-red-600">{errors.witnessPresence.message}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="immediateAction" className="block text-sm font-medium text-slate-800 mb-2">
+          What did you do immediately after witnessing the incident? <span className="text-red-500">*</span>
+        </label>
+        <select
+          id="immediateAction"
+          className={`block w-full px-4 py-3 pr-10 truncate rounded-xl border ${errors.immediateAction ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          {...register('immediateAction', { required: 'Please select an option' })}
+        >
+          <option value="">Select an option</option>
+          <option value="I left the area">I left the area</option>
+          <option value="I stayed nearby and continued to observe">I stayed nearby and continued to observe</option>
+          <option value="I approached and tried to intervene">I approached and tried to intervene</option>
+          <option value="I went to find a member of staff">I went to find a member of staff</option>
+          <option value="I contacted someone else about it">I contacted someone else about it</option>
+
+          <option value="I would rather not say">I would rather not say</option>
+        </select>
+        {errors.immediateAction && <p className="mt-1 text-sm text-red-600">{errors.immediateAction.message}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="ongoingStatus" className="block text-sm font-medium text-slate-800 mb-2">
+          Is the situation you are reporting still ongoing as far as you are aware? (Optional)
+        </label>
+        <select
+          id="ongoingStatus"
+          className="block w-full px-4 py-3 pr-10 truncate rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors"
+          {...register('ongoingStatus')}
+        >
+          <option value="">Select an option</option>
+          <option value="Yes, I believe it is ongoing">Yes, I believe it is ongoing</option>
+          <option value="No, I believe it has concluded">No, I believe it has concluded</option>
+          <option value="I am not certain of the current situation">I am not certain of the current situation</option>
+        </select>
       </div>
 
       <div>
@@ -134,8 +218,44 @@ export default function StructuredFields({ register, errors, watch }) {
           You can attach one photo or video if it helps.
         </p>
         {selectedMedia && (
-          <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
-            Selected file: <span className="font-semibold">{selectedMedia.name}</span>
+          <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm">
+            <div className="px-4 py-3 border-b border-slate-200 flex justify-between items-center bg-white">
+              <div className="flex items-center gap-2 overflow-hidden mr-4">
+                <span className="text-sm font-medium text-slate-700 truncate">
+                  {selectedMedia.name}
+                </span>
+                <span className="text-xs text-slate-500 shrink-0">
+                  ({(selectedMedia.size / (1024 * 1024)).toFixed(2)} MB)
+                </span>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setValue('media', null)}
+                className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-colors"
+                title="Remove media"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            {previewUrl && (
+              <div className="bg-slate-100 flex items-center justify-center p-2">
+                {selectedMedia.type.startsWith('image/') ? (
+                  <img 
+                    src={previewUrl} 
+                    alt="Preview" 
+                    className="max-h-64 object-contain rounded-lg shadow-sm"
+                  />
+                ) : selectedMedia.type.startsWith('video/') ? (
+                  <video 
+                    src={previewUrl} 
+                    controls 
+                    className="max-h-64 rounded-lg shadow-sm w-full"
+                  />
+                ) : (
+                  <div className="py-8 text-slate-500 text-sm">Preview not available</div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

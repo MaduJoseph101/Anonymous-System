@@ -11,9 +11,10 @@ export default function AdminNavbar() {
   if (!admin) return null;
 
   const isSuperAdmin = admin.role === 'SUPER_ADMIN';
+  const isReportDetailPage = location.pathname.startsWith('/admin/reports/');
 
   return (
-    <nav className="bg-slate-900 border-b border-slate-800 text-slate-100 z-50 relative shadow-md">
+    <nav className={`bg-slate-900 border-b border-slate-800 text-slate-100 z-50 shadow-md ${isReportDetailPage ? 'relative' : 'sticky top-0'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-2.5 py-2.5 md:flex-row md:justify-between md:items-center md:h-16 md:py-0">
           

@@ -286,7 +286,7 @@ export default function UsersPage() {
           </div>
           <div>
             <label className="block text-xs font-black uppercase tracking-widest text-slate-800 mb-1.5 pl-1">Role</label>
-            <select {...registerAdd('role', { required: true })} className="w-full px-4 py-3.5 bg-slate-50 font-bold text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white cursor-pointer shadow-sm transition-colors">
+            <select {...registerAdd('role', { required: true })} className="w-full px-4 py-3.5 pr-10 truncate bg-slate-50 font-bold text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white cursor-pointer shadow-sm transition-colors">
               <option value="">Select role</option>
               {Object.entries(ADMIN_ROLES).map(([key, label]) => (
                 <option key={key} value={key}>{label}</option>
@@ -317,7 +317,7 @@ export default function UsersPage() {
           </div>
           <div>
             <label className="block text-xs font-black uppercase tracking-widest text-slate-800 mb-1.5 pl-1">Role</label>
-            <select {...registerEdit('role', { required: true })} className="w-full px-4 py-3.5 bg-white font-bold text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer shadow-sm transition-colors">
+            <select {...registerEdit('role', { required: true })} className="w-full px-4 py-3.5 pr-10 truncate bg-white font-bold text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer shadow-sm transition-colors">
               {Object.entries(ADMIN_ROLES).map(([key, label]) => (
                 <option key={key} value={key}>{label}</option>
               ))}

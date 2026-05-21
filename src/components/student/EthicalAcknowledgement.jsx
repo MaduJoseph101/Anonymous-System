@@ -74,7 +74,7 @@ export default function EthicalAcknowledgement({ onAcknowledge, disabled = false
             {isFormIncomplete && (
               <p className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-                Incomplete Fields: Please fill out all required incident details above (Campus Location, Description, Location Note, Time, and Context) to unlock these confirmations.
+                Incomplete Fields: Please complete all mandatory fields above to access these confirmations.
               </p>
             )}
           </div>

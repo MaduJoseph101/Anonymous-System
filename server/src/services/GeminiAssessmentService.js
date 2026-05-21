@@ -125,6 +125,14 @@ ${report.uncertainty_statement
   ? '\nReporter Uncertainty Statement: ' + report.uncertainty_statement : ''}
 ${report.reporter_context
   ? '\nReporter Context (why they were there): ' + report.reporter_context : ''}
+${report.pattern_observation
+  ? '\nPattern Observation: ' + report.pattern_observation : ''}
+${report.witness_presence
+  ? '\nWitness Presence: ' + report.witness_presence : ''}
+${report.immediate_action
+  ? '\nImmediate Action: ' + report.immediate_action : ''}
+${report.ongoing_status
+  ? '\nOngoing Status: ' + report.ongoing_status : ''}
 
 ${mediaSection}
 

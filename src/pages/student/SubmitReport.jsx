@@ -14,7 +14,7 @@ import TrackingCodeDisplay from '../../components/student/TrackingCodeDisplay';
 
 export default function SubmitReport() {
   const navigate = useNavigate();
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     defaultValues: {
       category: '',
       location: '',
@@ -22,6 +22,10 @@ export default function SubmitReport() {
       locationDescription: '',
       timeOfDay: '',
       reporterContext: '',
+      patternObservation: '',
+      witnessPresence: '',
+      immediateAction: '',
+      ongoingStatus: '',
       uncertaintyStatement: ''
     }
   });
@@ -41,6 +45,8 @@ export default function SubmitReport() {
   const locationDescriptionValue = watch('locationDescription') || '';
   const timeOfDay = watch('timeOfDay') || '';
   const reporterContext = watch('reporterContext') || '';
+  const witnessPresence = watch('witnessPresence') || '';
+  const immediateAction = watch('immediateAction') || '';
   const selectedMedia = watch('media')?.[0] || null;
   const requiresCooling = selectedCategory ? HIGH_STAKES_CATEGORIES.includes(selectedCategory) : false;
 
@@ -51,7 +57,9 @@ export default function SubmitReport() {
     descriptionValue.length >= 30 &&
     locationDescriptionValue.length > 0 &&
     !!timeOfDay &&
-    reporterContext.length > 0;
+    reporterContext.length > 0 &&
+    !!witnessPresence &&
+    !!immediateAction;
 
   const onSubmit = async (data) => {
     if (!acknowledged) {
@@ -76,6 +84,10 @@ export default function SubmitReport() {
     if (data.uncertaintyStatement) payload.uncertaintyStatement = data.uncertaintyStatement;
     if (data.reporterContext) payload.reporterContext = data.reporterContext;
     if (data.timeOfDay) payload.timeOfDay = data.timeOfDay;
+    if (data.patternObservation) payload.patternObservation = data.patternObservation;
+    if (data.witnessPresence) payload.witnessPresence = data.witnessPresence;
+    if (data.immediateAction) payload.immediateAction = data.immediateAction;
+    if (data.ongoingStatus) payload.ongoingStatus = data.ongoingStatus;
     if (selectedMedia) payload.media = selectedMedia;
 
     try {
@@ -163,7 +175,7 @@ export default function SubmitReport() {
 
           {selectedCategory && (
             <div className="animate-in fade-in slide-in-from-top-4 duration-500 space-y-8">
-              <StructuredFields register={register} errors={errors} watch={watch} />
+              <StructuredFields register={register} errors={errors} watch={watch} setValue={setValue} />
             </div>
           )}
 

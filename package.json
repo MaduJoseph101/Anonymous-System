@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^2.0.2",
     "@tailwindcss/forms": "^0.4.0-alpha.2",
     "@tailwindcss/vite": "^4.2.2",
     "axios": "^1.15.0",

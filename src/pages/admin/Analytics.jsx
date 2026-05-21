@@ -118,11 +118,11 @@ export default function Analytics() {
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm relative overflow-hidden">
-             <div className="absolute top-0 right-0 w-24 h-24 bg-purple-100 rounded-full blur-3xl -mr-6 -mt-6"></div>
-             <div className="text-purple-900 text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2 z-10 relative">
-                <Calendar className="w-4 h-4 text-purple-500" /> Active Frame
+             <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-100 rounded-full blur-3xl -mr-6 -mt-6"></div>
+             <div className="text-indigo-900 text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2 z-10 relative">
+                <Calendar className="w-4 h-4 text-indigo-500" /> Active Frame
              </div>
-             <div className="text-2xl sm:text-3xl font-extrabold text-purple-700 tracking-tighter relative z-10">Last {days} days</div>
+             <div className="text-2xl sm:text-3xl font-extrabold text-indigo-700 tracking-tighter relative z-10">Last {days} days</div>
           </div>
         </div>
 

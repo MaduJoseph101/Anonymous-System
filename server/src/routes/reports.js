@@ -80,6 +80,10 @@ router.post('/submit',
         uncertaintyStatement,
         reporterContext,
         timeOfDay,
+        patternObservation,
+        witnessPresence,
+        immediateAction,
+        ongoingStatus,
         verificationToken
       } = req.body;
 
@@ -88,6 +92,10 @@ router.post('/submit',
       const sanitizedLocationDescription = replaceEmDashes(locationDescription);
       const sanitizedUncertaintyStatement = replaceEmDashes(uncertaintyStatement);
       const sanitizedReporterContext = replaceEmDashes(reporterContext);
+      const sanitizedPatternObservation = replaceEmDashes(patternObservation);
+      const sanitizedWitnessPresence = replaceEmDashes(witnessPresence);
+      const sanitizedImmediateAction = replaceEmDashes(immediateAction);
+      const sanitizedOngoingStatus = replaceEmDashes(ongoingStatus);
 
       const trackingCode = generateTrackingCode();
       const requiresEscrow = EscrowService.requiresEscrow(category);
@@ -108,6 +116,10 @@ router.post('/submit',
           uncertainty_statement: sanitizedUncertaintyStatement ? encrypt(sanitizedUncertaintyStatement) : null,
           reporter_context: sanitizedReporterContext ? encrypt(sanitizedReporterContext) : null,
           time_of_day: timeOfDay || null,
+          pattern_observation: sanitizedPatternObservation ? encrypt(sanitizedPatternObservation) : null,
+          witness_presence: sanitizedWitnessPresence ? encrypt(sanitizedWitnessPresence) : null,
+          immediate_action: sanitizedImmediateAction ? encrypt(sanitizedImmediateAction) : null,
+          ongoing_status: sanitizedOngoingStatus ? encrypt(sanitizedOngoingStatus) : null,
           status: requiresEscrow ? 'ESCROW' : 'RECEIVED',
           is_in_escrow: requiresEscrow,
           escrow_release_at: requiresEscrow
@@ -194,6 +206,10 @@ router.post('/submit',
             uncertainty_statement: sanitizedUncertaintyStatement,
             reporter_context: sanitizedReporterContext,
             time_of_day: timeOfDay,
+            pattern_observation: sanitizedPatternObservation,
+            witness_presence: sanitizedWitnessPresence,
+            immediate_action: sanitizedImmediateAction,
+            ongoing_status: sanitizedOngoingStatus,
             created_at: report.created_at,
             evidence: mappedEvidence
           };
@@ -292,6 +308,10 @@ router.get('/track/:trackingCode', async (req, res, next) => {
         uncertaintyStatement: decrypt(report.uncertainty_statement),
         reporterContext: decrypt(report.reporter_context),
         timeOfDay: report.time_of_day,
+        patternObservation: decrypt(report.pattern_observation),
+        witnessPresence: decrypt(report.witness_presence),
+        immediateAction: decrypt(report.immediate_action),
+        ongoingStatus: decrypt(report.ongoing_status),
         status: report.status,
         isInEscrow: report.is_in_escrow,
         escrowReleaseAt: report.escrow_release_at,

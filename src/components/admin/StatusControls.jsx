@@ -73,7 +73,7 @@ export default function StatusControls({ reportId, currentStatus, onStatusUpdate
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div>
            <select
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none text-sm text-slate-800 font-bold transition-all shadow-sm"
+            className="w-full px-4 py-3 pr-10 truncate bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none text-sm text-slate-800 font-bold transition-all shadow-sm"
             {...register('status', { required: true })}
           >
             <option value="">Select next status</option>
