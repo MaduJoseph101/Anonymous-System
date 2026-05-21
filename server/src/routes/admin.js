@@ -238,7 +238,8 @@ router.use(requireAuth);
 router.get('/reports', async (req, res, next) => {
   try {
     const EscrowService = require('../services/EscrowService');
-    await EscrowService.releaseExpiredEscrow();
+    // Run asynchronously to prevent blocking the dashboard load
+    EscrowService.releaseExpiredEscrow().catch(err => console.error('[Escrow] Async release error:', err));
     const { status, category, compositeTier, page = 1, limit = 20 } = req.query;
     const accessibleCategories = getAccessibleCategories(req.admin.role);
 

@@ -12,7 +12,7 @@ const { hashString } = require('../utils/hashString');
 const { encrypt, decrypt } = require('../utils/encryption');
 const CompositeCredibilityService = require('../services/CompositeCredibilityService');
 const EscrowService = require('../services/EscrowService');
-const NotificationService = require('../services/NotificationService');
+
 const MetadataHelper = require('../utils/metadataHelper');
 
 const replaceEmDashes = (str) => {
@@ -236,17 +236,7 @@ router.post('/submit',
             }
           });
 
-          // Notify only if NOT in escrow
-          if (!requiresEscrow) {
-            await NotificationService.notifyNewReport(
-              { 
-                ...report, 
-                composite_tier: composite.finalTier 
-              },
-              category
-            );
-          }
-
+          // Email notifications disabled per user request
         } catch (asyncError) {
           console.error('[Async] Assessment pipeline error:', asyncError.message);
           // Mark as failed but never propagate; report already saved

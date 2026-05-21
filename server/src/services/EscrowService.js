@@ -1,6 +1,5 @@
 const prisma = require('../lib/prisma');
 const { hashString } = require('../utils/hashString');
-const NotificationService = require('./NotificationService');
 
 const HIGH_STAKES_CATEGORIES = [
   'SEXUAL_HARASSMENT',
@@ -43,12 +42,7 @@ class EscrowService {
           `[Escrow] Released ${result.count} report(s) from escrow at ` +
           now.toISOString()
         );
-        // Notify relevant administrators for each released report
-        for (const r of toRelease) {
-          await NotificationService.notifyEscrowReleased(r, r.category).catch((e) => {
-            console.error('[Escrow] Notification failed for', r.tracking_code, e.message);
-          });
-        }
+        // Email notifications disabled per user request
       }
       return result.count;
     } catch (error) {
