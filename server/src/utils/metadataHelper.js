@@ -1,26 +1,27 @@
 const fs = require('fs');
+const sharp = require('sharp');
+const exifr = require('exifr');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 /**
- * Strips metadata (EXIF/GPS/Text chunks) from JPEGs and PNGs
- * and checks for signature software markers that suggest AI generation.
+ * Strips metadata from images and videos securely.
+ * Extracts metadata for AI credibility assessment.
  */
 class MetadataHelper {
 
   /**
-   * Scans a buffer or string for typical AI generator signatures
+   * Scans text values for typical AI generator signatures
    */
   static detectAISignatures(text) {
+    if (!text || typeof text !== 'string') return [];
+    
     const aiKeywords = [
-      'stable diffusion',
-      'midjourney',
-      'dall-e',
-      'dall·e',
-      'adobe firefly',
-      'bing image creator',
-      'leonardo.ai',
-      'artificial intelligence',
-      'ai generated',
-      'generative ai'
+      'stable diffusion', 'midjourney', 'dall-e', 'dall·e',
+      'adobe firefly', 'bing image creator', 'leonardo.ai',
+      'artificial intelligence', 'ai generated', 'generative ai'
     ];
     
     const textLower = text.toLowerCase();
@@ -36,201 +37,59 @@ class MetadataHelper {
   }
 
   /**
-   * Parses JPEG APP1 segment to find software markers before stripping
+   * Main scrub function: scrubs metadata from the file on disk and returns findings.
    */
-  static extractJpegMetadata(buffer) {
-    const findings = [];
-    if (buffer[0] !== 0xFF || buffer[1] !== 0xD8) return findings;
-    
-    let offset = 2;
-    while (offset < buffer.length) {
-      if (buffer[offset] !== 0xFF) break;
-      
-      const marker = buffer[offset + 1];
-      if (marker === 0xD9) break; // EOI
-      
-      if (marker >= 0xD0 && marker <= 0xD7) {
-        offset += 2;
-        continue;
-      }
-      
-      if (offset + 3 >= buffer.length) break;
-      const length = buffer.readUInt16BE(offset + 2);
-      
-      // Look into APP1 (EXIF / XMP metadata)
-      if (marker === 0xE1 && offset + 4 + length <= buffer.length) {
-        const app1Segment = buffer.subarray(offset + 4, offset + 2 + length);
-        const asciiStr = app1Segment.toString('ascii').replace(/[^\x20-\x7E]/g, ' ');
-        const detected = this.detectAISignatures(asciiStr);
-        if (detected.length > 0) {
-          findings.push(...detected);
-        }
-      }
-      
-      offset += 2 + length;
-    }
-    return [...new Set(findings)];
-  }
-
-  /**
-   * Parses PNG text and EXIF chunks to find software markers before stripping
-   */
-  static extractPngMetadata(buffer) {
-    const findings = [];
-    const pngSig = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-    for (let i = 0; i < 8; i++) {
-      if (buffer[i] !== pngSig[i]) return findings;
-    }
-    
-    let offset = 8;
-    while (offset < buffer.length) {
-      if (offset + 8 > buffer.length) break;
-      
-      const length = buffer.readUInt32BE(offset);
-      const type = buffer.subarray(offset + 4, offset + 8).toString('ascii');
-      const totalChunkLength = 12 + length;
-      
-      if (offset + totalChunkLength > buffer.length) break;
-      
-      // Check metadata text or EXIF chunks
-      if (['tEXt', 'zTXt', 'iTXt', 'eXIf'].includes(type)) {
-        const dataSegment = buffer.subarray(offset + 8, offset + 8 + length);
-        const asciiStr = dataSegment.toString('utf8').replace(/[^\x20-\x7E]/g, ' ');
-        const detected = this.detectAISignatures(asciiStr);
-        if (detected.length > 0) {
-          findings.push(...detected);
-        }
-      }
-      
-      offset += totalChunkLength;
-    }
-    return [...new Set(findings)];
-  }
-
-  /**
-   * Entrypoint to inspect a file buffer and extract AI metadata markers
-   */
-  static inspectMediaMetadata(buffer, mimeType) {
-    try {
-      if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') {
-        return this.extractJpegMetadata(buffer);
-      }
-      if (mimeType === 'image/png') {
-        return this.extractPngMetadata(buffer);
-      }
-    } catch (e) {
-      console.error('[MetadataHelper] Inspection failed:', e.message);
-    }
-    return [];
-  }
-
-  /**
-   * Entrypoint to scrub metadata (EXIF, tags, GPS, etc.) from an image buffer
-   */
-  static scrubJpegMetadata(buffer) {
-    if (buffer[0] !== 0xFF || buffer[1] !== 0xD8) return buffer;
-    
-    const resultChunks = [Buffer.from([0xFF, 0xD8])];
-    let offset = 2;
-    
-    while (offset < buffer.length) {
-      if (buffer[offset] !== 0xFF) {
-        resultChunks.push(buffer.subarray(offset));
-        break;
-      }
-      
-      const marker = buffer[offset + 1];
-      if (marker === 0xD9) {
-        resultChunks.push(Buffer.from([0xFF, 0xD9]));
-        break;
-      }
-      
-      if (marker >= 0xD0 && marker <= 0xD7) {
-        resultChunks.push(Buffer.from([0xFF, marker]));
-        offset += 2;
-        continue;
-      }
-      
-      if (offset + 3 >= buffer.length) {
-        resultChunks.push(buffer.subarray(offset));
-        break;
-      }
-      
-      const length = buffer.readUInt16BE(offset + 2);
-      
-      // Strip APP1 (EXIF, GPS, XMP), APP2 (profiles - often contain metadata), APP13 (Photoshop metadata)
-      const isMetadataMarker = (marker === 0xE1 || marker === 0xE2 || marker === 0xED);
-      
-      if (isMetadataMarker && offset + 2 + length <= buffer.length) {
-        offset += 2 + length;
-      } else {
-        const clampLength = Math.min(buffer.length - offset, 2 + length);
-        resultChunks.push(buffer.subarray(offset, offset + clampLength));
-        offset += clampLength;
-      }
-    }
-    
-    return Buffer.concat(resultChunks);
-  }
-
-  static scrubPngMetadata(buffer) {
-    const pngSig = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-    for (let i = 0; i < 8; i++) {
-      if (buffer[i] !== pngSig[i]) return buffer;
-    }
-    
-    const resultChunks = [buffer.subarray(0, 8)];
-    let offset = 8;
-    
-    while (offset < buffer.length) {
-      if (offset + 8 > buffer.length) {
-        resultChunks.push(buffer.subarray(offset));
-        break;
-      }
-      
-      const length = buffer.readUInt32BE(offset);
-      const type = buffer.subarray(offset + 4, offset + 8).toString('ascii');
-      const totalChunkLength = 12 + length;
-      
-      if (offset + totalChunkLength > buffer.length) {
-        resultChunks.push(buffer.subarray(offset));
-        break;
-      }
-      
-      // Keep only chunks necessary for rendering (IHDR, PLTE, IDAT, IEND, tRNS)
-      const isMetadata = ['tEXt', 'zTXt', 'iTXt', 'eXIf', 'tIME'].includes(type);
-      
-      if (isMetadata) {
-        offset += totalChunkLength;
-      } else {
-        resultChunks.push(buffer.subarray(offset, offset + totalChunkLength));
-        offset += totalChunkLength;
-      }
-    }
-    
-    return Buffer.concat(resultChunks);
-  }
-
-  /**
-   * Main scrub function: scrubs metadata from the file on disk and returns AI markers found.
-   */
-  static processAndScrubFile(filePath, mimeType) {
+  static async processAndScrubFile(filePath, mimeType) {
     try {
       if (!fs.existsSync(filePath)) return [];
       
-      const buffer = fs.readFileSync(filePath);
-      const findings = this.inspectMediaMetadata(buffer, mimeType);
+      let findings = [];
       
-      let scrubbedBuffer = buffer;
-      if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') {
-        scrubbedBuffer = this.scrubJpegMetadata(buffer);
-      } else if (mimeType === 'image/png') {
-        scrubbedBuffer = this.scrubPngMetadata(buffer);
+      // 1. Extract comprehensive metadata using exifr (supports images & some videos)
+      try {
+        const extractedMeta = await exifr.parse(filePath, {
+          xmp: true, tiff: true, ifd0: true, exif: true, gps: true, ipTC: true
+        });
+        
+        if (extractedMeta) {
+           const metaString = JSON.stringify(extractedMeta);
+           findings = this.detectAISignatures(metaString);
+        }
+      } catch (parseError) {
+        console.warn('[MetadataHelper] Exifr parsing failed (file may have no standard metadata):', parseError.message);
       }
       
-      // Save scrubbed file back to disk
-      fs.writeFileSync(filePath, scrubbedBuffer);
-      console.log(`[MetadataHelper] Processed & scrubbed media: ${filePath}. Findings:`, findings);
+      // 2. Scrub the file
+      if (mimeType.startsWith('image/')) {
+        // Use sharp to strip all metadata
+        const buffer = fs.readFileSync(filePath);
+        const scrubbedBuffer = await sharp(buffer)
+          .withMetadata(false)
+          .toBuffer();
+        
+        fs.writeFileSync(filePath, scrubbedBuffer);
+        console.log(`[MetadataHelper] Processed & scrubbed image: ${filePath}`);
+        
+      } else if (mimeType.startsWith('video/')) {
+        // Use fluent-ffmpeg to map streams without metadata
+        const tempPath = `${filePath}.tmp.mp4`;
+        
+        await new Promise((resolve, reject) => {
+          ffmpeg(filePath)
+            .outputOptions([
+              '-map_metadata', '-1', // Strip metadata
+              '-c:v', 'copy',        // Copy video stream
+              '-c:a', 'copy'         // Copy audio stream
+            ])
+            .save(tempPath)
+            .on('end', () => resolve())
+            .on('error', (err) => reject(err));
+        });
+        
+        // Replace original with scrubbed video
+        fs.renameSync(tempPath, filePath);
+        console.log(`[MetadataHelper] Processed & scrubbed video: ${filePath}`);
+      }
       
       return findings;
     } catch (e) {

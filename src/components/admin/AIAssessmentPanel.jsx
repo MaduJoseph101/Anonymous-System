@@ -162,7 +162,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
               <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-600">
                 <Brain className="w-5 h-5" />
               </div>
-              <h3 className="font-extrabold text-slate-800 text-lg tracking-tight">Forensic Media & Metadata</h3>
+              <h3 className="font-extrabold text-slate-800 text-lg tracking-tight">Forensic Media Analysis</h3>
               <span className="text-[10px] font-black px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-md ml-auto border border-indigo-100 uppercase tracking-widest">
                 Verification
               </span>

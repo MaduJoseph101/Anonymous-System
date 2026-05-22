@@ -133,7 +133,7 @@ router.post('/submit',
       let metadataFindings = [];
       if (req.file) {
         const absolutePath = req.file.path;
-        metadataFindings = MetadataHelper.processAndScrubFile(absolutePath, req.file.mimetype);
+        metadataFindings = await MetadataHelper.processAndScrubFile(absolutePath, req.file.mimetype);
         
         let finalSize = req.file.size;
         try {
