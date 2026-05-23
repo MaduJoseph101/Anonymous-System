@@ -100,7 +100,7 @@ export default function Analytics() {
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full blur-3xl -mr-6 -mt-6"></div>
             <div className="text-indigo-900 text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2 z-10 relative">
-               <TrendingUp className="w-4 h-4 text-indigo-500" /> System Total Density
+               <TrendingUp className="w-4 h-4 text-indigo-500" /> System Total Reports
             </div>
             {loading ? <div className="h-10 bg-slate-200 animate-pulse rounded w-24"></div> : (
               <div className="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tighter relative z-10">{analyticsData.totalReports || 0}</div>

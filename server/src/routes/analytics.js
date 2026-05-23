@@ -20,7 +20,7 @@ router.get('/overview', async (req, res, next) => {
       status: { notIn: ['RETRACTED_BY_REPORTER', 'ESCROW'] }
     };
 
-    const [total, byCategory, byStatus, byTier, dailyTrend] =
+    const [total, byCategory, byStatus, byTier, dailyTrend, avgTimeRows] =
       await Promise.all([
         prisma.report.count({ where }),
 
@@ -52,13 +52,25 @@ router.get('/overview', async (req, res, next) => {
           AND status NOT IN ('RETRACTED_BY_REPORTER', 'ESCROW')
           GROUP BY DATE(created_at)
           ORDER BY date ASC
+        `,
+
+        prisma.$queryRaw`
+          SELECT AVG(EXTRACT(EPOCH FROM (resolved_at - created_at))/3600)::numeric as avg_hours
+          FROM "Report"
+          WHERE created_at >= ${cutoff}
+          AND resolved_at IS NOT NULL
         `
       ]);
+
+    const averageResolutionTime = avgTimeRows[0]?.avg_hours 
+      ? Number(avgTimeRows[0].avg_hours).toFixed(1) 
+      : null;
 
     return res.status(200).json({
       success: true,
       analytics: {
         totalReports: total,
+        averageResolutionTime,
         byCategory: byCategory.map(b => ({
           category: b.category,
           count: b._count.id
@@ -101,28 +113,42 @@ router.get('/hotspots', async (req, res, next) => {
     });
 
     const hotspotMap = new Map();
-    const resolvedReports = await Promise.all(reports.map(async (report) => {
-      const decryptedReport = {
-        location: decrypt(report.location) || '',
-        location_description: decrypt(report.location_description) || '',
-        reporter_context: decrypt(report.reporter_context) || '',
-        description: decrypt(report.description) || '',
-        category: report.category
-      };
+    
+    // First decrypt all reports
+    const decryptedReports = reports.map(report => ({
+      location: decrypt(report.location) || '',
+      location_description: decrypt(report.location_description) || '',
+      reporter_context: decrypt(report.reporter_context) || '',
+      description: decrypt(report.description) || '',
+      category: report.category
+    }));
 
-      const extractedLocation = await HotspotExtractionService.extractLabel(decryptedReport);
+    // Batch extract locations to save API quota
+    const extractedLocations = await HotspotExtractionService.extractLabelsBatch(decryptedReports);
 
-      return {
-        ...decryptedReport,
-        extractedLocation: extractedLocation || 'Unknown location'
-      };
+    // Merge them together
+    const resolvedReports = decryptedReports.map((report, idx) => ({
+      ...report,
+      extractedLocation: extractedLocations[idx] || 'Unknown location'
     }));
 
     // Prune the extraction cache to ensure deleted/retracted reports are not stored in memory
     HotspotExtractionService.pruneCache(resolvedReports);
 
+    // Extract unique labels for clustering
+    const uniqueLocations = [...new Set(resolvedReports.map(r => r.extractedLocation))]
+      .filter(l => l && l !== 'Unknown location');
+    
+    // Get canonical mapping from AI
+    const locationMapping = await HotspotExtractionService.clusterLabels(uniqueLocations);
+
     resolvedReports.forEach((report) => {
-      const locationLabel = report.extractedLocation || 'Unknown location';
+      let locationLabel = report.extractedLocation || 'Unknown location';
+      
+      if (locationLabel !== 'Unknown location' && locationMapping[locationLabel]) {
+        locationLabel = locationMapping[locationLabel];
+      }
+
       const normalizedKey = locationLabel.toLowerCase();
 
       if (!hotspotMap.has(normalizedKey)) {

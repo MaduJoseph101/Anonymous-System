@@ -35,11 +35,15 @@ const upload = multer({
   storage,
   limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
-    if (/^(image|video)\//.test(file.mimetype)) {
+    const allowedExtensions = /\.(jpg|jpeg|png|gif|webp|mp4|mov|webm)$/i;
+    const isValidExt = allowedExtensions.test(path.extname(file.originalname));
+    const isValidMime = /^(image|video)\//.test(file.mimetype);
+
+    if (isValidExt && isValidMime) {
       cb(null, true);
       return;
     }
-    cb(new Error('Only image or video files are allowed'));
+    cb(new Error('Only valid image or video files (.jpg, .png, .mp4, etc) are allowed'));
   }
 });
 

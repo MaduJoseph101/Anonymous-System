@@ -12,10 +12,14 @@ class StatisticalDetectionService {
     // CHECK 1: Target Concentration
     // Multiple reports naming the same individual in a short window
     const fullNamePattern = /\b[A-Z][a-z]+ [A-Z][a-z]+\b/g;
-    const namesInReport = (report.description || '').match(fullNamePattern) || [];
+    const allNamesFound = (report.description || '').match(fullNamePattern) || [];
+    
+    // SECURITY PATCH: Deduplicate names and cap at 5 to prevent DoS via regex spam
+    const uniqueNames = [...new Set(allNamesFound)].slice(0, 5);
 
-    for (const name of namesInReport) {
+    if (uniqueNames.length > 0) {
       try {
+        // Query database ONCE for recent reports
         const recentReports = await prisma.report.findMany({
           where: {
             id: { not: report.id },
@@ -25,20 +29,24 @@ class StatisticalDetectionService {
           select: { description: true }
         });
 
-        let targetCount = 0;
-        for (const r of recentReports) {
-          const decrypted = decrypt(r.description) || '';
-          if (decrypted.includes(name)) targetCount++;
-        }
+        // Decrypt ONCE
+        const decryptedRecentDescriptions = recentReports.map(r => decrypt(r.description) || '');
 
-        if (targetCount >= 2) {
-          anomalies.push({
-            type: 'TARGET_CONCENTRATION',
-            severity: targetCount >= 4 ? 'HIGH' : 'MEDIUM',
-            detail: `"${name}" appears in ${targetCount + 1} reports in the ` +
-              `past 7 days. May indicate coordinated targeting or a genuine ` +
-              `pattern of behaviour; verify independently.`
-          });
+        for (const name of uniqueNames) {
+          let targetCount = 0;
+          for (const decryptedDesc of decryptedRecentDescriptions) {
+            if (decryptedDesc.includes(name)) targetCount++;
+          }
+
+          if (targetCount >= 2) {
+            anomalies.push({
+              type: 'TARGET_CONCENTRATION',
+              severity: targetCount >= 4 ? 'HIGH' : 'MEDIUM',
+              detail: `"${name}" appears in ${targetCount + 1} reports in the ` +
+                `past 7 days. May indicate coordinated targeting or a genuine ` +
+                `pattern of behaviour; verify independently.`
+            });
+          }
         }
       } catch (err) {
         console.error('Target concentration check error:', err.message);

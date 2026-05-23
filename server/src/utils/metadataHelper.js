@@ -94,6 +94,17 @@ class MetadataHelper {
       return findings;
     } catch (e) {
       console.error('[MetadataHelper] Error processing file:', e.message);
+      // SECURITY: Delete the file if processing fails. 
+      // If it's a fake image (e.g. malicious HTML), sharp/ffmpeg will fail.
+      // Leaving it on disk creates a Stored XSS vulnerability.
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+          console.log(`[MetadataHelper] Deleted unprocessable/malicious file: ${filePath}`);
+        } catch (unlinkErr) {
+          console.error('[MetadataHelper] Failed to delete malicious file:', unlinkErr.message);
+        }
+      }
       return [];
     }
   }
