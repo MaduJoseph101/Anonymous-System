@@ -73,7 +73,7 @@ export default function TrackReport() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-16">
       <header className="bg-white border-b border-slate-200">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/" className="text-slate-400 hover:text-slate-600 transition-colors p-2 -ml-2 rounded-lg hover:bg-slate-50">
             <ArrowLeft className="w-5 h-5" />
           </Link>

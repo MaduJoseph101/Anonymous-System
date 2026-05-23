@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Filter, RefreshCw, AlertTriangle, AlertCircle, X } from 'lucide-react';
 import { api } from '../../services/api';
+import { toast } from 'react-hot-toast';
 import { REPORT_CATEGORIES, STATUS_CONFIG, CREDIBILITY_TIER_CONFIG } from '../../utils/constants';
 
 import AdminNavbar from '../../components/admin/AdminNavbar';
@@ -50,7 +51,11 @@ export default function Dashboard() {
       setLastUpdated(new Date());
     } catch (error) {
       console.error('Failed to fetch admin reports:', error);
-      setReports([]);
+      if (isRefresh) {
+        toast.error('Failed to refresh dashboard. Please check your connection.');
+      } else {
+        setReports([]);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);

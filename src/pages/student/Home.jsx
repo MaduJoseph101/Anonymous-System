@@ -43,10 +43,10 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       {/* Header */}
       <header className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 md:px-0 py-4 flex justify-between items-center">
+        <div className="w-full px-6 md:px-12 lg:px-16 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Shield className="w-8 h-8 text-blue-700" />
-            <span className="text-xl font-bold tracking-tight text-blue-900 hidden sm:inline-block">Anonymous Report</span>
+            <span className="text-xl font-bold tracking-tight text-blue-900 ml-1">Anonymous Report</span>
           </div>
           <div className="flex items-center space-x-4">
             <Link to="/track" className="text-sm font-medium text-blue-700 hover:text-blue-900 flex items-center space-x-1">

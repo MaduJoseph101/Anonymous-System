@@ -12,7 +12,7 @@ const TIER_COLORS = {
 };
 
 const STATUS_COLORS = {
-  RECEIVED: '#94a3b8',
+  RECEIVED: '#64748b',
   ESCROW: '#fcd34d',
   UNDER_REVIEW: '#60a5fa',
   INVESTIGATING: '#c084fc',
@@ -311,7 +311,7 @@ export const StatusPieChart = ({ data = [] }) => {
         const label = formatStatusLabel(activeTag);
         
         return (
-          <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+          <div key={activeTag} className="absolute -top-8 left-[50%] -translate-x-1/2 z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
             <CustomTooltip 
               active={true} 
               payload={[{
@@ -379,7 +379,7 @@ export const TierPieChart = ({ data = [] }) => {
         const label = formatTierLabel(activeTag);
         
         return (
-          <div className="absolute top-[45%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+          <div key={activeTag} className="absolute -top-8 left-[50%] -translate-x-1/2 z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
             <CustomTooltip 
               active={true} 
               payload={[{
