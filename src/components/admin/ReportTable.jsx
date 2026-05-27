@@ -3,6 +3,17 @@ import { MessageCircle, CheckCircle, Inbox } from 'lucide-react';
 import { STATUS_CONFIG, CREDIBILITY_TIER_CONFIG } from '../../utils/constants';
 import { formatCategory, formatRelativeTime } from '../../utils/formatters';
 
+const STATUS_HEX_COLORS = {
+  RECEIVED: '#64748b',
+  ESCROW: '#fcd34d',
+  UNDER_REVIEW: '#60a5fa',
+  INVESTIGATING: '#c084fc',
+  ACTION_TAKEN: '#fb923c',
+  RESOLVED: '#4ade80',
+  CLOSED: '#94a3b8',
+  RETRACTED_BY_REPORTER: '#fca5a5'
+};
+
 export default function ReportTable({ reports = [], loading, onReportClick }) {
   
   if (loading) {
@@ -78,9 +89,8 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
               <th className="px-6 py-4 hidden md:table-cell">Location</th>
               <th className="px-6 py-4">Status</th>
               <th className="px-6 py-4 hidden lg:table-cell">AI Tier</th>
-              <th className="px-6 py-4">Messages</th>
+              <th className="px-6 py-4 text-center">Messages</th>
               <th className="px-6 py-4">Submitted</th>
-              <th className="px-6 py-4 text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 bg-white">
@@ -119,7 +129,12 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
                   
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                       <span className="font-mono text-blue-700 font-bold truncate max-w-[100px] sm:max-w-none">{trackingCode}</span>
+                       <div className="relative inline-flex items-center">
+                         <span className="font-mono text-blue-700 font-bold truncate max-w-[100px] sm:max-w-none">{trackingCode}</span>
+                         {statusKey === 'RECEIVED' && (
+                           <span className="absolute -top-1 -right-2 w-1.5 h-1.5 rounded-full bg-red-500" title="Unreviewed"></span>
+                         )}
+                       </div>
                        {isVerified && (
                           <CheckCircle className="w-4 h-4 text-green-500 shrink-0" title="Verified Student" />
                        )}
@@ -135,7 +150,10 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
                   </td>
                   
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600">
+                    <span 
+                      className="inline-flex items-center text-xs font-bold"
+                      style={{ color: STATUS_HEX_COLORS[statusKey] || '#475569' }}
+                    >
                       {statusInfo.label}
                     </span>
                   </td>
@@ -152,9 +170,9 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
                     )}
                   </td>
                   
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-center">
                     {messageCount > 0 ? (
-                      <div className="flex items-center gap-1.5 text-slate-500">
+                      <div className="flex items-center justify-center gap-1.5 text-slate-500">
                         <MessageCircle className="w-4 h-4" />
                         <span className="font-bold">{messageCount}</span>
                       </div>
@@ -165,15 +183,6 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
                   
                   <td className="px-6 py-4 text-slate-500 text-sm">
                     {formatRelativeTime(report.createdAt || report.created_at)}
-                  </td>
-                  
-                  <td className="px-6 py-4 text-right">
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); onReportClick(report.id); }}
-                      className="inline-flex items-center justify-center px-3 py-1.5 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
-                    >
-                      View Details
-                    </button>
                   </td>
                 </tr>
               );
@@ -198,7 +207,12 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
               {/* Header: Tracking Code, Relative Time */}
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-blue-600 font-extrabold tracking-tight">{trackingCode}</span>
+                  <div className="relative inline-flex items-center pr-2">
+                    <span className="font-mono text-blue-600 font-extrabold tracking-tight">{trackingCode}</span>
+                    {report.status === 'RECEIVED' && (
+                      <span className="absolute -top-0.5 -right-0 w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    )}
+                  </div>
                   {isVerified && <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />}
                 </div>
                 <span className="text-slate-400 font-bold">{formatRelativeTime(report.createdAt || report.created_at)}</span>
@@ -215,7 +229,10 @@ export default function ReportTable({ reports = [], loading, onReportClick }) {
               {/* Footer: Status and Message Count */}
               <div className="flex items-center justify-between mt-1 pt-2 border-t border-slate-50">
                 <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-black tracking-wide uppercase ${statusInfo.colour}`}>
+                  <span 
+                    className="inline-flex items-center text-[10px] font-black tracking-wide uppercase"
+                    style={{ color: STATUS_HEX_COLORS[report.status] || '#475569' }}
+                  >
                     {statusInfo.label}
                   </span>
                 </div>

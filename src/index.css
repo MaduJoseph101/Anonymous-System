@@ -77,3 +77,21 @@ input[type="radio"],
 .cursor-pointer {
   cursor: pointer !important;
 }
+
+/* Bulletproof Navbar Visibility Classes */
+@media (min-width: 768px) {
+  .desktop-navbar-force {
+    display: flex !important;
+  }
+  .mobile-navbar-force {
+    display: none !important;
+  }
+}
+@media (max-width: 767px) {
+  .desktop-navbar-force {
+    display: none !important;
+  }
+  .mobile-navbar-force {
+    display: flex !important;
+  }
+}

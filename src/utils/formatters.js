@@ -13,7 +13,16 @@ export const formatRole = (roleValue) => {
 export const formatRelativeTime = (dateString) => {
   if (!dateString) return 'Unknown date';
   try {
-    return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    let str = formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    str = str.replace(/^(about|almost|over)\s+/i, '');
+    if (str.includes('less than a minute')) {
+      return 'just now';
+    }
+    str = str.replace(/\s+minutes?/i, 'mins');
+    str = str.replace(/\s+minute/i, 'min');
+    str = str.replace(/\s+hours?/i, 'hrs');
+    str = str.replace(/\s+hour/i, 'hr');
+    return str;
   } catch {
     return 'Unknown date';
   }

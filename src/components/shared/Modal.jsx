@@ -19,7 +19,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
         onClick={onClose} />
       <div className={`relative bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full animate-in fade-in zoom-in-95 duration-200
         ${sizes[size]} max-h-[92vh] overflow-y-auto`}>
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-30">
           <h2 className="text-base sm:text-lg font-bold text-gray-900">{title}</h2>
           <button onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors">

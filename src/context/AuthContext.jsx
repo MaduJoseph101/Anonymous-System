@@ -29,11 +29,13 @@ export const AuthProvider = ({ children }) => {
         } else {
           localStorage.removeItem('asirs_admin_token');
           localStorage.removeItem('asirs_admin_data');
+          localStorage.removeItem('asirs_analytics_timeframe');
         }
       }
     } catch {
       localStorage.removeItem('asirs_admin_token');
       localStorage.removeItem('asirs_admin_data');
+      localStorage.removeItem('asirs_analytics_timeframe');
     } finally {
       setLoading(false);
     }
@@ -56,6 +58,7 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(() => {
     localStorage.removeItem('asirs_admin_token');
     localStorage.removeItem('asirs_admin_data');
+    localStorage.removeItem('asirs_analytics_timeframe');
     setAdmin(null);
   }, []);
 

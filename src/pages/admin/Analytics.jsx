@@ -16,7 +16,15 @@ export default function Analytics() {
   const [hotspots, setHotspots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [days, setDays] = useState(7);
+  const [days, setDays] = useState(() => {
+    const saved = localStorage.getItem('asirs_analytics_timeframe');
+    return saved ? parseInt(saved, 10) : 7;
+  });
+
+  const handleSetDays = (newDays) => {
+    setDays(newDays);
+    localStorage.setItem('asirs_analytics_timeframe', newDays);
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -84,7 +92,7 @@ export default function Analytics() {
               <button
                 key={range.value}
                 type="button"
-                onPointerDown={() => setDays(range.value)}
+                onPointerDown={() => handleSetDays(range.value)}
                 className={`px-4 py-2.5 text-sm font-bold rounded-lg transition-colors duration-150 whitespace-nowrap cursor-pointer border ${days === range.value ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md border-indigo-700' : 'bg-white text-slate-600 border-transparent hover:bg-slate-50'}`}
               >
                 {range.label}

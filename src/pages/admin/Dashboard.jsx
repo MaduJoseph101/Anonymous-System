@@ -175,7 +175,9 @@ export default function Dashboard() {
               className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 pr-10 truncate outline-none font-bold whitespace-nowrap min-w-[150px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
             >
               <option value="">All Statuses</option>
-              {Object.keys(STATUS_CONFIG).map(s => (
+              {Object.keys(STATUS_CONFIG)
+                .filter(s => s !== 'ESCROW')
+                .map(s => (
                 <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
               ))}
             </select>
