@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Eye, CheckCircle, MessageSquare, ChevronDown, ChevronUp, Lock, AlertCircle, Users, AlertTriangle } from 'lucide-react';
+import { Shield, Eye, CheckCircle, MessageSquare, ChevronDown, ChevronUp, Lock, AlertCircle, Users, AlertTriangle, Menu, X } from 'lucide-react';
 import { REPORT_CATEGORIES } from '../../utils/constants';
 
 export default function Home() {
@@ -39,16 +39,20 @@ export default function Home() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
-        <div className="w-full px-6 md:px-12 lg:px-16 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <Shield className="w-8 h-8 text-blue-700" />
-            <span className="text-xl font-bold tracking-tight text-blue-900 ml-1">Anonymous Report</span>
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div className="w-full px-4 sm:px-6 md:px-12 lg:px-16 py-3 sm:py-4 flex justify-between items-center relative z-50 bg-white">
+          <div className="flex items-center space-x-1.5 sm:space-x-2">
+            <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-blue-700" />
+            <span className="text-lg sm:text-xl font-bold tracking-tight text-blue-900">Anonymous Report</span>
           </div>
-          <div className="flex items-center space-x-4">
+          
+          {/* Desktop Nav */}
+          <div className="flex items-center space-x-4 max-sm:hidden">
             <Link to="/track" className="text-sm font-medium text-blue-700 hover:text-blue-900 flex items-center space-x-1">
               <Eye className="w-4 h-4" />
               <span>Track my report</span>
@@ -58,6 +62,98 @@ export default function Home() {
               <AlertTriangle className="w-4 h-4" />
               <span>Retract a report</span>
             </Link>
+          </div>
+
+          {/* Mobile Hamburger Toggle */}
+          <button 
+            className="sm:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Mobile Drawer Overlay */}
+        {isMenuOpen && (
+          <div 
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 sm:hidden" 
+            onClick={() => setIsMenuOpen(false)}
+          />
+        )}
+
+        {/* Mobile Drawer */}
+        <div 
+          className={`fixed top-0 right-0 h-full w-[260px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out sm:hidden flex flex-col ${
+            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          {/* Minimal Close Header */}
+          <div className="p-6 flex justify-end">
+            <button 
+              className="p-3 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-all active:scale-95 bg-slate-50"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          {/* Drawer Content */}
+          <div className="flex-1 px-5 space-y-3 mt-2">
+            <Link 
+              to="/track" 
+              onClick={() => setIsMenuOpen(false)}
+              className="group flex items-center justify-between w-full p-4 rounded-2xl transition-all hover:bg-slate-50 border border-transparent hover:border-slate-100 active:scale-[0.98]"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="bg-blue-50 text-blue-600 p-3 rounded-xl group-hover:bg-blue-100 transition-colors">
+                  <Eye className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="font-semibold text-slate-800 text-sm">Track Report</span>
+                  <span className="text-[11px] text-slate-500 font-medium mt-0.5">Check progress</span>
+                </div>
+              </div>
+            </Link>
+
+            <div className="px-4 py-0.5">
+              <div className="w-full h-px bg-slate-100"></div>
+            </div>
+            
+            <Link 
+              to="/retract" 
+              onClick={() => setIsMenuOpen(false)}
+              className="group flex items-center justify-between w-full p-4 rounded-2xl transition-all hover:bg-slate-50 border border-transparent hover:border-slate-100 active:scale-[0.98]"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="bg-amber-50 text-amber-600 p-3 rounded-xl group-hover:bg-amber-100 transition-colors">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="font-semibold text-slate-800 text-sm">Retract Report</span>
+                  <span className="text-[11px] text-slate-500 font-medium mt-0.5">Withdraw submission</span>
+                </div>
+              </div>
+            </Link>
+
+            <div className="pt-4 px-2">
+              <div className="w-full h-px bg-slate-100 mb-6"></div>
+              <Link 
+                to="/submit" 
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center justify-center space-x-2 w-full text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-100 px-5 py-3.5 rounded-xl transition-all active:scale-[0.98]"
+              >
+                <Shield className="w-4 h-4" />
+                <span>Submit a Report</span>
+              </Link>
+            </div>
+          </div>
+          
+          {/* Subtle Drawer Footer */}
+          <div className="p-6 mb-2">
+            <div className="flex items-center justify-center space-x-1.5 text-slate-400">
+              <Lock className="w-3 h-3" />
+              <span className="text-[10px] font-medium tracking-widest uppercase">End-to-End Secure</span>
+            </div>
           </div>
         </div>
       </header>
