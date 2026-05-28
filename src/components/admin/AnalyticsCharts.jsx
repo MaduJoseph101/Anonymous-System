@@ -11,6 +11,12 @@ const TIER_COLORS = {
   LOW: '#f87171'     // red-400
 };
 
+const FORENSICS_COLORS = {
+  AUTHENTIC: '#34d399',      // emerald-400
+  AI_GENERATED: '#f87171',   // red-400
+  EXIF_SCRUBBED: '#818cf8'   // indigo-400
+};
+
 const STATUS_COLORS = {
   RECEIVED: '#64748b',
   ESCROW: '#fcd34d',
@@ -43,6 +49,15 @@ const formatTierLabel = (tier) => {
     LOW: 'Low Credibility'
   };
   return labels[tier] || tier.replace(/_/g, ' ');
+};
+
+const formatForensicsLabel = (status) => {
+  const labels = {
+    AUTHENTIC: 'Authentic',
+    AI_GENERATED: 'Synthetic / AI',
+    EXIF_SCRUBBED: 'EXIF Scrubbed'
+  };
+  return labels[status] || status.replace(/_/g, ' ');
 };
 
 const CustomLegend = ({ payload, formatLabel, colors, activeTag, onActiveTagChange }) => {
@@ -429,6 +444,209 @@ export const TierPieChart = ({ data = [] }) => {
             {!activeTag && <Tooltip content={<CustomTooltip />} />}
             <Legend content={<CustomLegend formatLabel={formatTierLabel} colors={TIER_COLORS} activeTag={activeTag} onActiveTagChange={setActiveTag} />} />
           </PieChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
+};
+
+export const ForensicsPieChart = ({ data = [] }) => {
+  const [activeTag, setActiveTag] = React.useState(null);
+
+  return (
+    <div className="relative" style={{ width: '100%', height: 350 }}>
+      {activeTag && (() => {
+        const item = data.find(d => d.status === activeTag);
+        if (!item) return null;
+        const color = FORENSICS_COLORS[activeTag] || '#cbd5e1';
+        const label = formatForensicsLabel(activeTag);
+        
+        return (
+          <div key={activeTag} className="absolute -top-8 left-[50%] -translate-x-1/2 z-20 pointer-events-none animate-in fade-in zoom-in-95 duration-200">
+            <CustomTooltip 
+              active={true} 
+              payload={[{
+                name: label,
+                value: item.count,
+                color: color,
+                payload: item
+              }]} 
+              label={label} 
+            />
+          </div>
+        );
+      })()}
+
+      {data.length === 0 ? (
+        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACTED</div>
+      ) : (
+        <ResponsiveContainer>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="45%"
+              innerRadius={70}
+              outerRadius={100}
+              paddingAngle={4}
+              dataKey="count"
+              nameKey="status"
+              stroke="none"
+            >
+              {data.map((entry, index) => {
+                const isFaded = activeTag && entry.status !== activeTag;
+                return (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={FORENSICS_COLORS[entry.status] || '#cbd5e1'} 
+                    style={{
+                      transition: 'all 0.3s ease',
+                      opacity: isFaded ? 0.3 : 1,
+                      filter: (activeTag === entry.status) ? 'drop-shadow(0px 4px 6px rgba(0,0,0,0.15))' : 'none',
+                      cursor: 'pointer'
+                    }}
+                  />
+                );
+              })}
+            </Pie>
+            {!activeTag && <Tooltip content={<CustomTooltip />} />}
+            <Legend content={<CustomLegend formatLabel={formatForensicsLabel} colors={FORENSICS_COLORS} activeTag={activeTag} onActiveTagChange={setActiveTag} />} />
+          </PieChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
+};
+
+export const FlagsBarChart = ({ data = [] }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+  const [activeIndex, setActiveIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const activeItem = data[activeIndex];
+
+  return (
+    <div className="relative" style={{ width: '100%', height: 350 }}>
+      {activeItem && (
+        <div className="absolute -top-3 left-0 right-0 mx-auto w-[90%] sm:w-fit min-w-[220px] bg-white/95 backdrop-blur-md border border-slate-200/80 px-4 py-2 rounded-xl shadow-lg flex items-center justify-center animate-in slide-in-from-top-2 duration-300 z-20 pointer-events-none">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/5 bg-red-400 transition-colors duration-300" />
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-700 transition-all duration-300 text-center">
+              {activeItem.label}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {data.length === 0 ? (
+        <div className="h-full flex items-center justify-center text-sm font-bold text-slate-400 font-mono tracking-widest">NO STATISTICAL BLOCKS EXTRACTED</div>
+      ) : (
+        <ResponsiveContainer>
+          <BarChart 
+            data={data} 
+            layout="vertical" 
+            margin={{ top: 40, right: 30, left: 10, bottom: 5 }}
+            onClick={(state) => {
+              if (state && state.activePayload && state.activePayload.length > 0) {
+                const clickedLabel = state.activePayload[0].payload.label;
+                const idx = data.findIndex(d => d.label === clickedLabel);
+                if (idx !== -1) setActiveIndex(idx);
+              } else if (state && state.activeTooltipIndex !== undefined) {
+                setActiveIndex(state.activeTooltipIndex);
+              }
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+            <XAxis type="number" fontSize={10} tickLine={false} axisLine={false} fontWeight={700} stroke="#94a3b8" />
+            <YAxis 
+              type="category" 
+              dataKey="label" 
+              width={isMobile ? 80 : 130} 
+              tickLine={false} 
+              axisLine={false} 
+              stroke="#64748b" 
+              tick={(props) => {
+                const { x, y, payload } = props;
+                const index = data.findIndex(d => d.label === payload.value);
+                const isActive = activeIndex === index;
+                const truncatedText = isMobile 
+                  ? (payload.value.length > 14 ? payload.value.slice(0, 11) + '...' : payload.value)
+                  : (payload.value.length > 22 ? payload.value.slice(0, 19) + '...' : payload.value);
+                
+                return (
+                  <g 
+                    transform={`translate(${x},${y})`} 
+                    className="cursor-pointer" 
+                    onClick={(e) => { e.stopPropagation(); setActiveIndex(index); }}
+                  >
+                    <rect x={-(isMobile ? 80 : 130)} y={-15} width={isMobile ? 80 : 130} height={30} fill="transparent" />
+                    <text
+                      x={-6}
+                      y={3}
+                      textAnchor="end"
+                      fill={isActive ? '#ef4444' : '#64748b'}
+                      fontWeight={isActive ? 900 : 600}
+                      fontSize={isMobile ? 8 : 9}
+                      className="transition-all duration-300 select-none"
+                    >
+                      {truncatedText}
+                    </text>
+                  </g>
+                );
+              }}
+            />
+            <Tooltip 
+              content={<CustomTooltip />} 
+              cursor={{fill: '#f8fafc', cursor: 'pointer'}} 
+              allowEscapeViewBox={{ x: true, y: true }}
+              wrapperStyle={{ 
+                transition: 'transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                zIndex: 1000
+              }}
+            />
+            <Bar 
+              dataKey="count" 
+              radius={[0, 6, 6, 0]} 
+              barSize={20}
+              className="cursor-pointer"
+              background={(props) => {
+                const { x, y, width, height, index } = props;
+                const offset = isMobile ? 80 : 130;
+                return (
+                  <rect 
+                    x={x - offset - 10} 
+                    y={y - 6} 
+                    width={width + offset + 20} 
+                    height={height + 12} 
+                    fill="transparent"
+                    rx={6}
+                    onClick={(e) => { e.stopPropagation(); setActiveIndex(index); }}
+                    className="cursor-pointer transition-colors duration-300"
+                  />
+                );
+              }}
+            >
+              {data.map((entry, index) => {
+                const isActive = activeIndex === index;
+                return (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={isActive ? '#f87171' : '#fee2e2'}
+                    onClick={(e) => { e.stopPropagation(); setActiveIndex(index); }}
+                    style={{
+                      transition: 'all 0.3s ease'
+                    }}
+                  />
+                );
+              })}
+            </Bar>
+          </BarChart>
         </ResponsiveContainer>
       )}
     </div>

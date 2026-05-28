@@ -34,7 +34,7 @@ router.get('/overview', async (req, res, next) => {
       status: { notIn: ['RETRACTED_BY_REPORTER', 'ESCROW'] }
     };
 
-    const [total, byCategory, byStatus, byTier, dailyTrend, avgTimeRows] =
+    const [total, byCategory, byStatus, byTier, dailyTrend, avgTimeRows, auditLogGroup, rawReportsData] =
       await Promise.all([
         prisma.report.count({ where }),
 
@@ -73,8 +73,111 @@ router.get('/overview', async (req, res, next) => {
           FROM "Report"
           WHERE created_at >= ${startDate} AND created_at <= ${endDate}
           AND resolved_at IS NOT NULL
-        `
+        `,
+        
+        prisma.auditLog.groupBy({
+          by: ['admin_id'],
+          where: { created_at: { gte: startDate, lte: endDate }, admin_id: { not: null } },
+          _count: { id: true },
+          orderBy: { _count: { id: 'desc' } }
+        }),
+
+        prisma.report.findMany({
+          where: {
+            created_at: { gte: startDate, lte: endDate },
+            status: { notIn: ['RETRACTED_BY_REPORTER', 'ESCROW'] }
+          },
+          select: {
+            id: true,
+            category: true,
+            location: true,
+            ai_assessment_json: true,
+            statistical_flags_json: true,
+            similarity_flags_json: true
+          }
+        })
       ]);
+
+    // Format Admin Activity
+    const adminActivity = [];
+    if (auditLogGroup.length > 0) {
+      const adminIds = auditLogGroup.map(g => g.admin_id);
+      const admins = await prisma.adminUser.findMany({
+        where: { id: { in: adminIds } },
+        select: { id: true, full_name: true, role: true }
+      });
+      const adminMap = admins.reduce((acc, a) => ({ ...acc, [a.id]: a }), {});
+      
+      for (const group of auditLogGroup) {
+        if (adminMap[group.admin_id]) {
+          adminActivity.push({
+            node: adminMap[group.admin_id].full_name,
+            role: adminMap[group.admin_id].role,
+            actions: group._count.id
+          });
+        }
+      }
+    }
+
+    // Process JSON Fields for Forensics, Structural, Similarity
+    const forensicsMap = { AUTHENTIC: 0, AI_GENERATED: 0, EXIF_SCRUBBED: 0 };
+    const structuralFlagsMap = {};
+    const similarityClusters = [];
+    
+    let hasForensics = false;
+
+    rawReportsData.forEach(rep => {
+      // 1. Structural Flags
+      if (rep.statistical_flags_json) {
+        try {
+          const statData = JSON.parse(rep.statistical_flags_json);
+          if (statData.anomalies && Array.isArray(statData.anomalies)) {
+            statData.anomalies.forEach(anomaly => {
+              const label = anomaly.type || anomaly;
+              structuralFlagsMap[label] = (structuralFlagsMap[label] || 0) + 1;
+            });
+          }
+        } catch (e) {}
+      }
+
+      // 2. Forensics (Look at ai_assessment_json for media insights)
+      if (rep.ai_assessment_json) {
+        try {
+          const aiData = JSON.parse(rep.ai_assessment_json);
+          // Only tally if there's an actual media forensics node in the json
+          if (aiData.mediaForensics) {
+            hasForensics = true;
+            const status = aiData.mediaForensics.status || 'AUTHENTIC'; // fallback map
+            forensicsMap[status] = (forensicsMap[status] || 0) + 1;
+          }
+        } catch (e) {}
+      }
+
+      // 3. Similarity Clusters
+      if (rep.similarity_flags_json) {
+        try {
+          const simData = JSON.parse(rep.similarity_flags_json);
+          if ((simData.suspiciousReports && simData.suspiciousReports.length > 0) || 
+              (simData.convergentReports && simData.convergentReports.length > 0)) {
+            const count = (simData.suspiciousReports?.length || 0) + (simData.convergentReports?.length || 0) + 1; // plus self
+            const risk = simData.hasSuspiciousPattern ? 'HIGH' : simData.hasGenuineConvergence ? 'LOW' : 'MEDIUM';
+            const decryptedLoc = rep.location ? (decrypt(rep.location) || 'Unknown location') : 'Unknown location';
+            similarityClusters.push({
+              location: decryptedLoc,
+              count: count,
+              category: rep.category,
+              risk: risk
+            });
+          }
+        } catch (e) {}
+      }
+    });
+
+    const structuralFlagsData = Object.entries(structuralFlagsMap)
+      .map(([label, count]) => ({ label, count }))
+      .sort((a, b) => b.count - a.count);
+
+    const forensicsData = hasForensics ? Object.entries(forensicsMap).filter(f => f[1] > 0).map(([status, count]) => ({ status, count })) : [];
 
     const averageResolutionTime = avgTimeRows[0]?.avg_hours 
       ? Number(avgTimeRows[0].avg_hours).toFixed(1) 
@@ -98,7 +201,11 @@ router.get('/overview', async (req, res, next) => {
           count: b._count.id
         })),
         dailyTrend,
-        periodDays: diffDays
+        periodDays: diffDays,
+        adminActivity,
+        structuralFlagsData,
+        forensicsData,
+        similarityClusters
       }
     });
   } catch (error) {

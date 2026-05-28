@@ -58,8 +58,17 @@ export default function AuditLog({ auditLogs = [] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end mb-2">
-        <div className="flex flex-col sm:flex-row bg-white p-1 rounded-xl border border-slate-200 shadow-sm items-center gap-1 shrink-0 w-full md:w-auto hover:border-indigo-300 transition-all duration-300 focus-within:ring-4 focus-within:ring-indigo-50 focus-within:border-indigo-400">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <div className="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3 shrink-0">
+           <div className="bg-indigo-50 p-2 rounded-lg">
+             <Activity className="w-4 h-4 text-indigo-600" />
+           </div>
+           <div>
+             <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Logs</div>
+             <div className="text-sm font-black text-slate-800">{auditLogs.length} Events</div>
+           </div>
+        </div>
+        <div className="flex flex-col sm:flex-row bg-white p-1 rounded-xl border border-slate-200 shadow-sm items-center gap-1 shrink-0 w-full sm:w-auto hover:border-indigo-300 transition-all duration-300 focus-within:ring-4 focus-within:ring-indigo-50 focus-within:border-indigo-400">
            <div className="flex flex-col relative px-3 py-1.5 hover:bg-slate-50 rounded-lg transition-colors w-full sm:w-auto">
              <div className="flex items-center gap-1.5 mb-0.5 pointer-events-none">
                 <Calendar className="w-3 h-3 text-indigo-500" />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BarChart2, TrendingUp, Calendar, RefreshCw, AlertTriangle, MapPin, Clock } from 'lucide-react';
+import { BarChart2, TrendingUp, Calendar, RefreshCw, AlertTriangle, MapPin, Clock, Network, Users } from 'lucide-react';
 import { api } from '../../services/api';
 import AdminNavbar from '../../components/admin/AdminNavbar';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -7,7 +7,9 @@ import {
   CategoryBarChart, 
   StatusPieChart, 
   TierPieChart, 
-  DailyTrendLine 
+  DailyTrendLine,
+  ForensicsPieChart,
+  FlagsBarChart
 } from '../../components/admin/AnalyticsCharts';
 import { formatCategory } from '../../utils/formatters';
 import ModernDatePicker from '../../components/admin/ModernDatePicker';
@@ -99,6 +101,12 @@ export default function Analytics() {
   const reportsByCredibility = analyticsData.reportsByCredibility || analyticsData.byCredibilityTier || [];
   const dailyTrends = analyticsData.dailyTrends || analyticsData.dailyTrend || [];
 
+  // Data for new modules (Fallback to empty arrays if not in API)
+  const forensicsData = analyticsData.forensicsData || [];
+  const structuralFlagsData = analyticsData.structuralFlagsData || [];
+  const similarityClusters = analyticsData.similarityClusters || [];
+  const adminActivity = analyticsData.adminActivity || [];
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-16">
       <AdminNavbar />
@@ -155,7 +163,7 @@ export default function Analytics() {
         <div className={`transition-all duration-150 ${loading ? 'opacity-80 translate-y-0.5' : 'opacity-100 translate-y-0'}`}>
 
         {/* Summary Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-md:gap-10 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full blur-3xl -mr-6 -mt-6"></div>
             <div className="text-indigo-900 text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2 z-10 relative">
@@ -188,7 +196,7 @@ export default function Analytics() {
         </div>
 
         {/* Chart Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-md:gap-10 mb-8">
            <ChartCard title="Categories" loading={loading}>
               <CategoryBarChart data={reportsByCategory} />
            </ChartCard>
@@ -201,22 +209,30 @@ export default function Analytics() {
               <TierPieChart data={reportsByCredibility} />
            </ChartCard>
 
+           <ChartCard title="Media Forensics" loading={loading}>
+              <ForensicsPieChart data={forensicsData} />
+           </ChartCard>
+
+           <ChartCard title="Structural Flags" loading={loading}>
+              <FlagsBarChart data={structuralFlagsData} />
+           </ChartCard>
+
            <ChartCard title="Trends" loading={loading}>
               <DailyTrendLine data={dailyTrends} />
            </ChartCard>
         </div>
 
         {/* Hotspots Table */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-           <div className="border-b border-slate-200 bg-slate-50 p-4 md:p-6 flex items-center justify-between">
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mt-12 md:mt-8">
+           <div className="border-b border-slate-200 bg-white p-4 md:p-6 flex items-center justify-between">
               <h2 className="text-base md:text-lg font-black text-slate-800 flex items-center gap-2 uppercase tracking-wide">
                 <MapPin className="w-5 h-5 text-red-500" /> Hotspots
               </h2>
            </div>
            
            <div className="overflow-x-auto max-md:hidden">
-             <table className="w-full text-left text-sm whitespace-nowrap">
-               <thead className="bg-white text-slate-500 font-extrabold uppercase tracking-widest text-[11px] border-b border-slate-200">
+             <table className="w-full text-center text-sm whitespace-nowrap">
+               <thead className="bg-white text-slate-500 font-extrabold uppercase tracking-widest text-[11px] border-b border-slate-200 text-center">
                  <tr>
                    <th className="px-6 py-4 border-r border-slate-100">Location</th>
                    <th className="px-6 py-4 border-r border-slate-100">Count</th>
@@ -234,7 +250,7 @@ export default function Analytics() {
                     <tr><td colSpan="3" className="px-6 py-12 text-center text-slate-500 font-bold tracking-wide">No hotspots found.</td></tr>
                   ) : hotspots.slice(0, 10).map((spot, i) => (
                    <tr key={i} className={`hover:bg-slate-50 border-white border-b-2 transition-colors ${spot.count > 5 ? 'border-l-4 border-l-red-500 shadow-sm' : 'border-l-4 border-l-transparent'}`}>
-                     <td className="px-6 py-4 font-black text-slate-800 flex items-center gap-2 border-r border-slate-100">{spot.location || 'Unknown location'}</td>
+                     <td className="px-6 py-4 font-black text-slate-800 flex items-center justify-center gap-2 border-r border-slate-100">{spot.location || 'Unknown location'}</td>
                      <td className="px-6 py-4 border-r border-slate-100">
                        <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black shadow-inner border tracking-wider ${spot.count > 5 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-white border-slate-200 text-slate-700'}`}>
                          {spot.count} {spot.count > 5 && <AlertTriangle className="w-3 h-3 ml-1 text-red-600" />}
@@ -265,6 +281,162 @@ export default function Analytics() {
                    </div>
                    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black shadow-inner border tracking-wider ${spot.count > 5 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-white border-slate-200 text-slate-700'}`}>
                      {spot.count}
+                   </span>
+                 </div>
+               </div>
+             ))}
+           </div>
+        </div>
+
+        {/* Similarity Clusters Table */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mt-12 md:mt-8">
+           <div className="border-b border-slate-200 bg-white p-4 md:p-6 flex items-center justify-between">
+              <h2 className="text-base md:text-lg font-black text-slate-800 flex items-center gap-2 uppercase tracking-wide">
+                <Network className="w-5 h-5 text-indigo-500" /> Similarity Clusters
+              </h2>
+           </div>
+           
+           <div className="overflow-x-auto max-md:hidden">
+             <table className="w-full text-center text-sm whitespace-nowrap">
+               <thead className="bg-white text-slate-500 font-extrabold uppercase tracking-widest text-[11px] border-b border-slate-200 text-center">
+                 <tr>
+                   <th className="px-6 py-4 border-r border-slate-100">Location</th>
+                   <th className="px-6 py-4 border-r border-slate-100">Category</th>
+                   <th className="px-6 py-4 border-r border-slate-100">Risk Level</th>
+                   <th className="px-6 py-4">Number of Reports</th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-slate-100 bg-slate-50/20">
+                 {loading ? [1,2].map(i => (
+                   <tr key={i} className="animate-pulse">
+                     <td className="px-6 py-5 border-r border-slate-100"><div className="h-4 bg-slate-200 rounded w-24"></div></td>
+                     <td className="px-6 py-5 border-r border-slate-100"><div className="h-4 bg-slate-200 rounded w-12"></div></td>
+                     <td className="px-6 py-5 border-r border-slate-100"><div className="h-4 bg-slate-200 rounded w-32"></div></td>
+                     <td className="px-6 py-5"><div className="h-4 bg-slate-200 rounded w-20"></div></td>
+                   </tr>
+                  )) : similarityClusters.map((cluster, i) => (
+                   <tr key={i} className={`hover:bg-slate-50 border-white border-b-2 transition-colors ${cluster.count > 4 ? 'border-l-4 border-l-red-500 shadow-sm' : 'border-l-4 border-l-transparent'}`}>
+                     <td className="px-6 py-4 font-black text-slate-800 flex items-center justify-center gap-2 border-r border-slate-100">{cluster.location}</td>
+                     <td className="px-6 py-4 text-slate-700 font-bold uppercase tracking-wider text-[11px] border-r border-slate-100">{formatCategory(cluster.category)}</td>
+                     <td className="px-6 py-4 border-r border-slate-100">
+                       <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border ${
+                         cluster.risk === 'HIGH' ? 'bg-red-50 border-red-200 text-red-700' :
+                         cluster.risk === 'MEDIUM' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                         'bg-emerald-50 border-emerald-200 text-emerald-700'
+                       }`}>
+                         {cluster.risk}
+                       </span>
+                     </td>
+                     <td className="px-6 py-4">
+                       <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black shadow-inner border tracking-wider ${cluster.count > 4 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-white border-slate-200 text-slate-700'}`}>
+                         {cluster.count} {cluster.count > 4 && <AlertTriangle className="w-3 h-3 ml-1 text-red-600" />}
+                       </span>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+           </div>
+
+           <div className="md:hidden divide-y divide-slate-100">
+             {loading ? [1,2].map(i => (
+               <div key={i} className="animate-pulse p-4 space-y-3">
+                 <div className="h-4 bg-slate-200 rounded w-2/3"></div>
+                 <div className="h-4 bg-slate-200 rounded w-24"></div>
+               </div>
+              )) : similarityClusters.map((cluster, i) => (
+               <div key={i} className={`p-4 ${cluster.count > 4 ? 'border-l-4 border-l-red-500' : 'border-l-4 border-l-transparent'}`}>
+                 <div className="flex items-start justify-between gap-3">
+                   <div className="min-w-0">
+                     <div className="font-black text-slate-800 truncate">{cluster.location}</div>
+                     <div className="mt-1 text-[10px] text-slate-500 font-bold uppercase tracking-wider">{formatCategory(cluster.category)}</div>
+                   </div>
+                   <div className="flex flex-col items-end gap-2">
+                     <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black shadow-inner border tracking-wider ${cluster.count > 4 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-white border-slate-200 text-slate-700'}`}>
+                       {cluster.count}
+                     </span>
+                     <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border ${
+                         cluster.risk === 'HIGH' ? 'bg-red-50 border-red-200 text-red-700' :
+                         cluster.risk === 'MEDIUM' ? 'bg-amber-50 border-amber-200 text-amber-700' :
+                         'bg-emerald-50 border-emerald-200 text-emerald-700'
+                       }`}>
+                       {cluster.risk}
+                     </span>
+                   </div>
+                 </div>
+               </div>
+             ))}
+           </div>
+        </div>
+
+        {/* Admin Activity Table */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm mt-12 md:mt-8">
+           <div className="border-b border-slate-200 bg-white p-4 md:p-6 flex items-center justify-between">
+              <h2 className="text-base md:text-lg font-black text-slate-800 flex items-center gap-2 uppercase tracking-wide">
+                <Users className="w-5 h-5 text-blue-500" /> Admin Node Activity
+              </h2>
+           </div>
+           
+           <div className="overflow-x-auto max-md:hidden">
+             <table className="w-full text-center text-sm whitespace-nowrap">
+               <thead className="bg-white text-slate-500 font-extrabold uppercase tracking-widest text-[11px] border-b border-slate-200 text-center">
+                 <tr>
+                   <th className="px-6 py-4 border-r border-slate-100">Node Identifier</th>
+                   <th className="px-6 py-4 border-r border-slate-100">Role Type</th>
+                   <th className="px-6 py-4">Total Actions</th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-slate-100 bg-slate-50/20">
+                 {loading ? [1,2].map(i => (
+                   <tr key={i} className="animate-pulse">
+                     <td className="px-6 py-5 border-r border-slate-100"><div className="h-4 bg-slate-200 rounded w-48"></div></td>
+                     <td className="px-6 py-5 border-r border-slate-100"><div className="h-4 bg-slate-200 rounded w-20"></div></td>
+                     <td className="px-6 py-5"><div className="h-4 bg-slate-200 rounded w-16"></div></td>
+                   </tr>
+                  )) : adminActivity.map((admin, i) => (
+                   <tr key={i} className="hover:bg-slate-50 border-white border-b-2 transition-colors border-l-4 border-l-transparent">
+                     <td className="px-6 py-4 font-black text-slate-800 border-r border-slate-100">{admin.node}</td>
+                     <td className="px-6 py-4 border-r border-slate-100">
+                       <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border ${
+                         admin.role === 'SYSTEM' ? 'bg-purple-50 border-purple-200 text-purple-700' :
+                         'bg-blue-50 border-blue-200 text-blue-700'
+                       }`}>
+                         {admin.role}
+                       </span>
+                     </td>
+                     <td className="px-6 py-4">
+                       <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black shadow-inner border bg-white border-slate-200 text-slate-700 tracking-wider">
+                         {admin.actions}
+                       </span>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+           </div>
+
+           <div className="md:hidden divide-y divide-slate-100">
+             {loading ? [1,2].map(i => (
+               <div key={i} className="animate-pulse p-4 space-y-3">
+                 <div className="h-4 bg-slate-200 rounded w-2/3"></div>
+                 <div className="h-4 bg-slate-200 rounded w-24"></div>
+               </div>
+              )) : adminActivity.map((admin, i) => (
+               <div key={i} className="p-4 border-l-4 border-l-transparent">
+                 <div className="flex items-start justify-between gap-3">
+                   <div className="min-w-0">
+                     <div className="font-black text-slate-800 truncate">{admin.node}</div>
+                     <div className="mt-1">
+                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border ${
+                         admin.role === 'SYSTEM' ? 'bg-purple-50 border-purple-200 text-purple-700' :
+                         'bg-blue-50 border-blue-200 text-blue-700'
+                       }`}>
+                         {admin.role}
+                       </span>
+                     </div>
+                   </div>
+                   <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black shadow-inner border bg-white border-slate-200 text-slate-700 tracking-wider">
+                     {admin.actions}
                    </span>
                  </div>
                </div>
