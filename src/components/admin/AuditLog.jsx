@@ -1,17 +1,54 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, User, ShieldAlert } from 'lucide-react';
+import { Clock, User, ShieldAlert, FileText, CheckCircle, Activity, MessageSquare, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
+import ModernDatePicker from './ModernDatePicker';
 
 export default function AuditLog({ auditLogs = [] }) {
-  const [expanded, setExpanded] = useState(false);
+  const [dateRange, setDateRange] = useState({
+    startDate: '',
+    endDate: ''
+  });
+
+  const handleDateChange = (field, value) => {
+    setDateRange(prev => ({ ...prev, [field]: value }));
+  };
+
+  const filteredLogs = auditLogs.filter(log => {
+    if (!log.created_at) return true;
+    const logDate = new Date(log.created_at);
+    
+    if (dateRange.startDate) {
+      const start = new Date(dateRange.startDate);
+      start.setHours(0, 0, 0, 0);
+      if (logDate < start) return false;
+    }
+    
+    if (dateRange.endDate) {
+      const end = new Date(dateRange.endDate);
+      end.setHours(23, 59, 59, 999);
+      if (logDate > end) return false;
+    }
+    
+    return true;
+  });
 
   const getActionTheme = (action) => {
     switch (action) {
-      case 'VIEWED_REPORT': return 'bg-slate-100 text-slate-800 border-slate-300';
-      case 'STATUS_UPDATED': return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'MESSAGE_SENT': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-      case 'OUTCOME_RECORDED': return 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-300';
-      default: return 'bg-slate-100 text-slate-800 border-slate-300';
+      case 'VIEWED_REPORT': return 'bg-slate-50 border-slate-200 text-slate-600';
+      case 'STATUS_UPDATED': return 'bg-blue-50 border-blue-200 text-blue-700';
+      case 'MESSAGE_SENT': return 'bg-emerald-50 border-emerald-200 text-emerald-700';
+      case 'OUTCOME_RECORDED': return 'bg-indigo-50 border-indigo-200 text-indigo-700';
+      default: return 'bg-slate-50 border-slate-200 text-slate-600';
+    }
+  };
+
+  const getActionIcon = (action) => {
+    switch (action) {
+      case 'VIEWED_REPORT': return <Activity className="w-3 h-3 shrink-0" />;
+      case 'STATUS_UPDATED': return <ShieldAlert className="w-3 h-3 shrink-0" />;
+      case 'MESSAGE_SENT': return <MessageSquare className="w-3 h-3 shrink-0" />;
+      case 'OUTCOME_RECORDED': return <CheckCircle className="w-3 h-3 shrink-0" />;
+      default: return <FileText className="w-3 h-3 shrink-0" />;
     }
   };
 
@@ -20,47 +57,66 @@ export default function AuditLog({ auditLogs = [] }) {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-      <button 
-        onClick={() => setExpanded(!expanded)}
-        className="w-full bg-slate-900 hover:bg-slate-800 px-4 md:px-6 py-4 md:py-5 flex items-center justify-between gap-3 transition-colors outline-none text-white"
-      >
-        <div className="flex items-center gap-3 font-extrabold tracking-wide text-sm sm:text-lg text-left min-w-0">
-           <ShieldAlert className="w-5 h-5 text-blue-400" />
-           <span className="truncate">Secure Audit Log <span className="opacity-60 text-xs sm:text-sm ml-1 font-mono tracking-widest">[{auditLogs.length} BLOCKS]</span></span>
+    <div className="space-y-4">
+      <div className="flex justify-end mb-2">
+        <div className="flex flex-col sm:flex-row bg-white p-1 rounded-xl border border-slate-200 shadow-sm items-center gap-1 shrink-0 w-full md:w-auto hover:border-indigo-300 transition-all duration-300 focus-within:ring-4 focus-within:ring-indigo-50 focus-within:border-indigo-400">
+           <div className="flex flex-col relative px-3 py-1.5 hover:bg-slate-50 rounded-lg transition-colors w-full sm:w-auto">
+             <div className="flex items-center gap-1.5 mb-0.5 pointer-events-none">
+                <Calendar className="w-3 h-3 text-indigo-500" />
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Start Date</label>
+             </div>
+             <ModernDatePicker 
+               value={dateRange.startDate} 
+               maxDate={dateRange.endDate}
+               onChange={(val) => handleDateChange('startDate', val)}
+               alignRight={true}
+             />
+           </div>
+           
+           <div className="w-full h-px sm:w-px sm:h-8 bg-slate-200 my-1 sm:my-0 sm:mx-1"></div>
+           
+           <div className="flex flex-col relative px-3 py-1.5 hover:bg-slate-50 rounded-lg transition-colors w-full sm:w-auto">
+             <div className="flex items-center gap-1.5 mb-0.5 pointer-events-none">
+                <Calendar className="w-3 h-3 text-indigo-500" />
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">End Date</label>
+             </div>
+             <ModernDatePicker 
+               value={dateRange.endDate} 
+               minDate={dateRange.startDate}
+               maxDate={new Date().toISOString().split('T')[0]}
+               onChange={(val) => handleDateChange('endDate', val)}
+               alignRight={true}
+             />
+           </div>
         </div>
-        {expanded ? <ChevronUp className="w-6 h-6 text-slate-400" /> : <ChevronDown className="w-6 h-6 text-slate-400" />}
-      </button>
+      </div>
 
-      {expanded && (
-        <div className="p-4 md:p-6 border-t border-slate-200 bg-slate-50/80">
-          <div className="space-y-4">
-            {auditLogs.length === 0 ? (
-              <p className="text-sm text-slate-500 font-bold italic py-4 text-center">No immutable audit events logged yet.</p>
-            ) : (
-              auditLogs.map((log) => (
-                <div key={log.id} className="bg-white border border-slate-200 rounded-xl p-4 md:p-5 shadow-sm relative overflow-hidden flex flex-col md:flex-row gap-4 md:gap-5 md:items-center animate-in fade-in transition-all hover:border-slate-300 hover:shadow-md">
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-center gap-2">
-                       <div className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border shadow-sm ${getActionTheme(log.action)}`}>
-                         {getActionName(log.action)}
-                       </div>
-                    </div>
-                    <p className="text-sm text-slate-800 font-medium leading-relaxed max-w-3xl pr-4">{log.details}</p>
-                  </div>
-                  <div className="shrink-0 text-left md:text-right mt-2 md:mt-0 flex flex-col items-start md:items-end justify-center bg-slate-50 md:bg-transparent p-3 md:p-0 rounded-lg">
-                     <p className="text-sm font-black text-slate-900 flex items-center gap-2 whitespace-nowrap">
-                       <User className="w-4 h-4 text-blue-600" /> <span className="uppercase tracking-wide">{log.admin?.name || 'System Auto-Node'}</span>
-                     </p>
-                     <p className="text-[11px] text-slate-500 font-mono font-bold tracking-widest mt-1">
-                       {log.created_at ? format(new Date(log.created_at), 'dd MMM yyyy, HH:mm') : 'Unknown Timestamp'}
-                     </p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+      {filteredLogs.length === 0 ? (
+        <div className="text-sm font-bold text-slate-500 py-6 rounded-2xl bg-slate-50 border-2 border-slate-100 px-5 text-center shadow-sm">
+          {auditLogs.length > 0 ? "No audit events match the selected date range." : "No immutable audit events logged yet."}
         </div>
+      ) : (
+        filteredLogs.map((log) => (
+          <div key={log.id} className="bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col md:flex-row gap-4 md:gap-5 md:items-center transition-all hover:bg-white hover:border-slate-200 hover:shadow-md duration-300">
+            <div className="flex-1 space-y-3">
+              <div className="flex items-center gap-2">
+                 <div className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border flex items-center gap-1.5 ${getActionTheme(log.action)}`}>
+                   {getActionIcon(log.action)} {getActionName(log.action)}
+                 </div>
+              </div>
+              <p className="text-sm text-slate-800 font-medium leading-relaxed max-w-3xl pr-4">{log.details}</p>
+            </div>
+            <div className="shrink-0 text-left md:text-right mt-2 md:mt-0 flex flex-col items-start md:items-end justify-center bg-white border-2 border-slate-100 md:border-transparent md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none">
+               <p className="text-sm font-black text-slate-800 flex items-center gap-2 whitespace-nowrap">
+                 <User className="w-4 h-4 text-blue-500" /> <span className="uppercase tracking-widest">{log.admin?.name || 'System Auto-Node'}</span>
+               </p>
+               <p className="text-[11px] text-slate-500 font-mono font-bold tracking-widest mt-1.5 flex items-center md:justify-end gap-1.5">
+                 <Clock className="w-3 h-3" />
+                 {log.created_at ? format(new Date(log.created_at), 'dd MMM yyyy, HH:mm') : 'Unknown Timestamp'}
+               </p>
+            </div>
+          </div>
+        ))
       )}
     </div>
   );

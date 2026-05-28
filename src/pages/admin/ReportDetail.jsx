@@ -206,8 +206,8 @@ export default function ReportDetail() {
            
            {/* Primary Description */}
            <div>
-            <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2">Description</div>
-             <div className="text-slate-800 leading-relaxed font-medium bg-slate-50/70 border border-slate-100 p-4 sm:p-5 rounded-xl whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
+            <div className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-indigo-400"></div>Description</div>
+             <div className="text-slate-800 text-sm sm:text-base leading-relaxed font-medium bg-white border-2 border-slate-100 p-5 sm:p-6 rounded-2xl whitespace-pre-wrap shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                {report.description}
              </div>
            </div>
@@ -215,7 +215,7 @@ export default function ReportDetail() {
            {/* Grid fields */}
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
              <div>
-               <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Location</div>
+               <div className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-blue-400"></div>Location</div>
                <div className="font-medium text-slate-800 flex items-start gap-2">
                  {report.location || 'Not provided'}
                </div>
@@ -223,7 +223,7 @@ export default function ReportDetail() {
              
              {report.locationDescription && (
                <div>
-                 <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2">Location Note</div>
+                 <div className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-slate-400"></div>Location Note</div>
                  <div className="text-sm text-slate-700 italic" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                    &ldquo;{report.locationDescription}&rdquo;
                  </div>
@@ -232,7 +232,7 @@ export default function ReportDetail() {
              
              {report.timeOfDay && (
                <div>
-                 <div className="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-2 border-l-2 border-slate-300 pl-2 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Time</div>
+                 <div className="text-xs font-black uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-amber-400"></div>Time</div>
                  <div className="font-medium text-slate-800">
                    {report.timeOfDay.replace(/_/g, ' ')}
                  </div>
@@ -296,9 +296,9 @@ export default function ReportDetail() {
               { label: 'Ongoing Status', value: report.ongoingStatus || report.ongoing_status || 'Not provided' },
               { label: 'Verification', value: report.verificationMethod || report.verification_method || 'Not used' }
             ].map((field) => (
-              <div key={field.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{field.label}</div>
-                <div className="text-sm font-semibold text-slate-800 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{field.value}</div>
+              <div key={field.label} className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 hover:bg-white hover:shadow-md hover:border-blue-100 transition-all duration-300">
+                <div className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-3 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>{field.label}</div>
+                <div className="text-sm font-semibold text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{field.value}</div>
               </div>
             ))}
           </div>
@@ -521,7 +521,7 @@ export default function ReportDetail() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Navigation Tabs */}
-        <div className="max-w-5xl mx-auto border-b border-slate-200 mb-6 bg-white/95 backdrop-blur-sm rounded-t-xl sticky top-0 sm:top-16 z-40 shadow-sm transition-all">
+        <div className={`max-w-5xl mx-auto border-b border-slate-200 mb-6 bg-white/95 backdrop-blur-sm rounded-t-xl z-40 shadow-sm transition-all ${activeTab === 'assessment' ? '' : 'sticky top-0 sm:top-16'}`}>
           <div className="flex justify-between sm:justify-center w-full overflow-x-auto hide-scrollbar -mb-px">
             <button onClick={() => setActiveTab('details')} className={tabClass('details')}>Details</button>
             <button onClick={() => setActiveTab('assessment')} className={tabClass('assessment')}>Assessment</button>

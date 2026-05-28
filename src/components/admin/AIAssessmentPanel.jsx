@@ -25,7 +25,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
   const tabClass = (tabId) => `px-4 sm:px-6 py-3 font-bold text-sm tracking-wide transition-colors border-b-2 whitespace-nowrap ${activeSubTab === tabId ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full relative">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full relative">
       
       {/* Header */}
       <div className="flex items-center justify-end px-3 pt-3 pb-1 sm:px-4 sm:pt-4 sm:pb-2">
@@ -35,7 +35,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
       </div>
 
       {/* Sub-Tabs Navigation */}
-      <div className="flex justify-start sm:justify-center w-full overflow-x-auto hide-scrollbar bg-white/95 backdrop-blur-sm sticky top-0 z-10 shrink-0 shadow-sm transition-all">
+      <div className="flex justify-start sm:justify-center w-full overflow-x-auto hide-scrollbar bg-white/95 backdrop-blur-sm sticky top-0 sm:top-16 z-40 shrink-0 shadow-sm transition-all rounded-t-xl sm:rounded-none">
         <button onClick={() => setActiveSubTab('overview')} className={tabClass('overview')}>Overview</button>
         <button onClick={() => setActiveSubTab('gemini')} className={tabClass('gemini')}>Gemini AI</button>
         {geminiDetail?.imageAnalysis?.length > 0 && (
@@ -55,8 +55,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
             <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 p-5 shadow-sm relative overflow-hidden">
                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-200/40 rounded-full blur-3xl -mr-10 -mt-10"></div>
                <div className="flex items-center gap-2 mb-3 relative z-10">
-                 <LayoutDashboard className="w-5 h-5 text-indigo-600" />
-                 <h3 className="font-extrabold text-indigo-950 text-lg tracking-tight">Executive Summary</h3>
+                 <h3 className="font-extrabold text-indigo-950 text-base sm:text-lg tracking-tight">Overall Summary</h3>
                </div>
                <p className="text-sm text-indigo-950 leading-relaxed whitespace-pre-wrap font-medium relative z-10" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                  {executiveSummary}
@@ -80,15 +79,15 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
 
             {signals.length > 0 && (
               <section className="pt-2">
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Key Signals</div>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-3 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>Key Signals</div>
+                <div className="grid grid-cols-1 gap-4">
                   {signals.map((signal, i) => (
-                    <div key={i} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-indigo-200 transition-colors">
-                      <div className="flex items-center justify-between gap-3 mb-2">
+                    <div key={i} className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 hover:bg-white hover:border-indigo-100 hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center justify-between gap-3 mb-3">
                         <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">{signal.source}</h4>
-                        <span className="text-xs font-bold text-slate-500">{signal.weight}</span>
+                        <span className="text-xs font-bold text-slate-500 bg-slate-200/50 px-2.5 py-1 rounded-md">{signal.weight}</span>
                       </div>
-                      <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{signal.summary}</p>
+                      <p className="text-sm font-medium text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{signal.summary}</p>
                     </div>
                   ))}
                 </div>
@@ -101,8 +100,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
         {activeSubTab === 'gemini' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex items-center gap-2 mb-2 border-b border-slate-100 pb-3">
-              <Brain className="w-5 h-5 text-purple-600" />
-              <h3 className="font-bold text-slate-800 text-lg tracking-tight">Gemini Contextual Analysis</h3>
+              <h3 className="font-bold text-slate-800 text-base sm:text-lg tracking-tight">Gemini Contextual Analysis</h3>
               <span className="text-[10px] font-extrabold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-md ml-auto border border-slate-200 uppercase">
                  40% Weight
               </span>
@@ -113,8 +111,8 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                  <CredibilityScoreBar score={geminiDetail.overallCredibilityScore} label="Inferred Authenticity" />
 
                  {geminiDetail.confidence && (
-                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                   <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Confidence</div>
+                 <div className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 hover:bg-white hover:border-blue-100 hover:shadow-md transition-all duration-300">
+                   <div className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-3 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Confidence</div>
                    <p className="text-sm font-semibold text-slate-800" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{geminiDetail.confidence}</p>
                  </div>
                )}
@@ -122,14 +120,14 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                  {geminiDetail.dimensions && (
                    <div className="space-y-3">
                      {Object.entries(geminiDetail.dimensions).map(([key, dimension]) => (
-                       <div key={key} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                         <div className="flex items-center justify-between gap-3 mb-2">
+                       <div key={key} className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 hover:bg-white hover:border-purple-100 hover:shadow-md transition-all duration-300">
+                         <div className="flex items-center justify-between gap-3 mb-3">
                            <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">
                              {key.replace(/([A-Z])/g, ' $1').trim()}
                            </h4>
-                           <span className="text-xs font-bold text-slate-500">{dimension.score}/25</span>
+                           <span className="text-xs font-bold text-slate-500 bg-slate-200/50 px-2.5 py-1 rounded-md">{dimension.score}/25</span>
                          </div>
-                         <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{dimension.observations}</p>
+                         <p className="text-sm font-medium text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{dimension.observations}</p>
                        </div>
                      ))}
                    </div>
@@ -140,7 +138,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                      <h4 className="text-xs font-bold text-red-800 uppercase tracking-widest flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5" /> Flags</h4>
                      <ul className="space-y-2">
                        {geminiDetail.flaggedConcerns.map((concern, i) => (
-                         <li key={i} className="text-sm font-medium text-red-800 leading-relaxed bg-red-50/80 border border-red-100 px-4 py-3 rounded-lg shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
+                         <li key={i} className="text-sm font-medium text-red-800 leading-relaxed bg-red-50/80 border-2 border-red-200 px-5 py-4 rounded-xl shadow-sm hover:border-red-300 transition-colors" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                            {concern}
                          </li>
                        ))}
@@ -153,7 +151,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                      <h4 className="text-xs font-bold text-green-800 uppercase tracking-widest flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Positives</h4>
                      <ul className="space-y-2">
                        {geminiDetail.positiveIndicators.map((ind, i) => (
-                         <li key={i} className="text-sm font-medium text-green-800 flex items-start gap-2 bg-green-50/80 border border-green-100 px-4 py-3 rounded-lg shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
+                         <li key={i} className="text-sm font-medium text-green-800 flex items-start gap-2 bg-green-50/80 border-2 border-green-200 px-5 py-4 rounded-xl shadow-sm hover:border-green-300 transition-colors" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                            {ind}
                          </li>
                        ))}
@@ -166,8 +164,8 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                      <h4 className="text-xs font-bold text-indigo-800 uppercase tracking-widest flex items-center gap-1"><Info className="w-3.5 h-3.5" /> CBCA Notes</h4>
                      <ul className="space-y-2">
                        {geminiDetail.cbcaStyleObservations.map((item, i) => (
-                         <li key={i} className="text-sm font-medium text-indigo-800 leading-relaxed bg-indigo-50 border border-indigo-100 px-4 py-3 rounded-lg shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
-                           <strong className="block text-xs uppercase tracking-widest mb-1">{item.criterion} - {item.status}</strong>
+                         <li key={i} className="text-sm font-medium text-indigo-800 leading-relaxed bg-indigo-50 border-2 border-indigo-200 px-5 py-4 rounded-xl shadow-sm hover:bg-white hover:border-indigo-300 transition-all duration-300" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
+                           <strong className="block text-xs uppercase tracking-widest mb-2">{item.criterion} - {item.status}</strong>
                            {item.observation}
                          </li>
                        ))}
@@ -199,14 +197,9 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
         {activeSubTab === 'forensics' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {geminiDetail && geminiDetail.imageAnalysis && geminiDetail.imageAnalysis.length > 0 ? (
-              <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/40 p-6 shadow-sm">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl"></div>
-                
+              <div className="space-y-1">
                 <div className="flex items-center gap-2.5 mb-6 border-b border-slate-100 pb-3.5">
-                  <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-600">
-                    <Brain className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-extrabold text-slate-800 text-lg tracking-tight">Forensic Media Analysis</h3>
+                  <h3 className="font-extrabold text-slate-800 text-base sm:text-lg tracking-tight">Forensic Media Analysis</h3>
                   <span className="text-[10px] font-black px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-md ml-auto border border-indigo-100 uppercase tracking-widest">
                     Verification
                   </span>
@@ -214,7 +207,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
 
                 {/* AI Generated Media Alert Banner */}
                 {geminiDetail.aiGeneratedImageDetected && (
-                  <div className="mb-6 relative overflow-hidden rounded-xl border border-red-200 bg-gradient-to-r from-red-50 to-orange-50 p-5 shadow-sm">
+                  <div className="mb-6 relative overflow-hidden rounded-2xl border-2 border-red-200 bg-gradient-to-r from-red-50 to-orange-50 p-5 shadow-sm">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl -mr-6 -mt-6"></div>
                     <div className="flex gap-3">
                       <div className="p-2 bg-red-100 text-red-600 rounded-lg h-fit shrink-0">
@@ -239,7 +232,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                     const details = img.observedDetails;
                     
                     return (
-                      <div key={idx} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:border-indigo-100 transition-all duration-300">
+                      <div key={idx} className="-mx-4 sm:mx-0 rounded-none sm:rounded-2xl border-y-2 border-x-0 sm:border-2 border-slate-100 bg-slate-50 p-4 sm:p-5 shadow-sm hover:bg-white hover:border-indigo-100 hover:shadow-md transition-all duration-300">
                         {/* Header line */}
                         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                           <div className="font-bold text-slate-800 text-sm truncate max-w-[240px]" title={img.filename}>
@@ -266,21 +259,17 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                         </div>
 
                         {/* Correlation Section */}
-                        <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                          <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">
-                            Context Correlation
-                          </div>
-                          <p className="text-xs text-slate-700 leading-relaxed" style={{ textAlign: 'justify' }}>
+                        <div className="-mx-2 sm:mx-0 mb-4 p-3 md:p-4 bg-white rounded-xl border-2 border-slate-100">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-2 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Context Correlation</div>
+                          <p className="text-sm font-medium text-slate-700 leading-relaxed" style={{ textAlign: 'justify' }}>
                             {correlation || "Linguistic-visual correlation complete."}
                           </p>
                         </div>
 
                         {/* Forensic Details */}
-                        <div>
-                          <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">
-                            Visual Observations & Findings
-                          </div>
-                          <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify' }}>
+                        <div className="-mx-2 sm:mx-0 p-3 md:p-4 bg-white rounded-xl border-2 border-slate-100">
+                          <div className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-2 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>Visual Observations & Findings</div>
+                          <p className="text-sm font-medium text-slate-700 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify' }}>
                             {details || "Healthy exposure and noise characteristics observed."}
                           </p>
                         </div>
@@ -301,8 +290,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
         {activeSubTab === 'structure' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex items-center gap-2 mb-2 border-b border-slate-100 pb-3">
-              <BarChart2 className="w-5 h-5 text-blue-600" />
-              <h3 className="font-bold text-slate-800 text-lg tracking-tight">Structural Analysis</h3>
+              <h3 className="font-bold text-slate-800 text-base sm:text-lg tracking-tight">Structural Analysis</h3>
               <span className="text-[10px] font-extrabold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-md ml-auto border border-slate-200 uppercase">
                  35% Weight
               </span>
@@ -314,28 +302,28 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
               <div className="space-y-3 mb-4 mt-6">
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Detailed Criteria</h4>
                 {structuralDetail.cbcaCriteria.map((item, i) => (
-                  <div key={i} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className="flex items-center justify-between gap-3 mb-2">
-                      <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">
-                        {item.criterion ? item.criterion.split('/')[0].trim() : ''}
+                  <div key={i} className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 shadow-sm hover:bg-white hover:border-blue-100 hover:shadow-md transition-all duration-300">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>{item.criterion ? item.criterion.split('/')[0].trim() : ''}
                       </h4>
-                      <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">{item.status}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md bg-white text-slate-500 border-2 border-slate-100 shadow-sm">{item.status}</span>
                     </div>
-                    <p className="text-sm text-slate-700 leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{item.observation}</p>
+                    <p className="text-sm font-medium text-slate-700 leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{item.observation}</p>
                   </div>
                 ))}
               </div>
             )}
             
             {structuralDetail?.positiveIndicators && structuralDetail.positiveIndicators.length > 0 ? (
-               <ul className="space-y-2 mt-4">
-                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Positive Structural Indicators</h4>
+               <ul className="space-y-3 mt-6">
+                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Positive Structural Indicators</h4>
                  {structuralDetail.positiveIndicators.map((ind, i) => (
-                   <li key={i} className="text-sm font-medium text-blue-800 flex items-center gap-2.5 bg-blue-50/80 border border-blue-100 px-4 py-3 rounded-lg shadow-sm" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
-                     <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-                       <CheckCircle className="w-3.5 h-3.5" />
+                   <li key={i} className="text-sm font-medium text-blue-800 flex items-center gap-3 bg-blue-50/80 border-2 border-blue-200 px-5 py-4 rounded-xl shadow-sm hover:border-blue-300 transition-colors" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
+                     <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shrink-0 shadow-sm border border-blue-200">
+                       <CheckCircle className="w-4 h-4" />
                      </div>
-                     {ind}
+                     <span className="leading-relaxed">{ind}</span>
                    </li>
                  ))}
                </ul>
@@ -351,8 +339,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
         {activeSubTab === 'stats' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-3">
-              <TrendingUp className="w-5 h-5 text-teal-600" />
-              <h3 className="font-bold text-slate-800 text-lg tracking-tight">Statistical Flags</h3>
+              <h3 className="font-bold text-slate-800 text-base sm:text-lg tracking-tight">Statistical Flags</h3>
               <span className="text-[10px] font-extrabold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-md ml-auto border border-slate-200 uppercase">
                  25% Weight
               </span>
@@ -361,14 +348,14 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
             {statisticalDetail?.anomalies?.length > 0 ? (
               <div className="space-y-3">
                 {statisticalDetail.anomalies.map((ano, i) => {
-                  const colors = ano.severity === 'HIGH' ? 'bg-red-50 border-red-200 text-red-900' :
-                                 ano.severity === 'MEDIUM' ? 'bg-amber-50 border-amber-300 text-amber-900' :
-                                 'bg-indigo-50 border-indigo-200 text-indigo-900';
+                  const colors = ano.severity === 'HIGH' ? 'bg-red-50/80 border-red-200 hover:border-red-300 text-red-900' :
+                                 ano.severity === 'MEDIUM' ? 'bg-amber-50/80 border-amber-200 hover:border-amber-300 text-amber-900' :
+                                 'bg-indigo-50/80 border-indigo-200 hover:border-indigo-300 text-indigo-900';
                   return (
-                    <div key={i} className={`p-4 rounded-xl border-l-4 shadow-sm ${colors} flex items-start gap-3`}>
+                    <div key={i} className={`px-5 py-4 rounded-2xl border-2 shadow-sm transition-colors duration-300 ${colors} flex items-start gap-3`}>
                       <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${ano.severity === 'HIGH' ? 'text-red-600' : ano.severity === 'MEDIUM' ? 'text-amber-600' : 'text-indigo-600'}`} />
                       <div>
-                        <strong className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-80">{ano.type}</strong>
+                        <strong className="block text-xs font-bold uppercase tracking-widest mb-1.5 opacity-80 flex items-center gap-2"><div className={`w-1.5 h-1.5 rounded-full ${ano.severity === 'HIGH' ? 'bg-red-500' : ano.severity === 'MEDIUM' ? 'bg-amber-500' : 'bg-indigo-500'}`}></div>{ano.type}</strong>
                         <span className="text-sm font-medium leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{ano.detail}</span>
                       </div>
                     </div>
@@ -376,7 +363,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                 })}
               </div>
             ) : (
-              <div className="text-sm font-bold text-green-700 flex items-center justify-center gap-2 bg-green-50/80 border border-green-200 px-4 py-4 rounded-xl shadow-sm">
+              <div className="text-sm font-bold text-green-700 flex items-center justify-center gap-2 bg-green-50/80 border-2 border-green-200 px-5 py-4 rounded-2xl shadow-sm">
                  <CheckCircle className="w-5 h-5" /> No statistical anomalies found.
               </div>
             )}
@@ -387,8 +374,7 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
         {activeSubTab === 'similarity' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-3">
-              <Copy className="w-5 h-5 text-slate-600" />
-              <h3 className="font-bold text-slate-800 text-lg tracking-tight">Similarity Context</h3>
+              <h3 className="font-bold text-slate-800 text-base sm:text-lg tracking-tight">Similarity Context</h3>
               <span className="text-[10px] font-extrabold px-2.5 py-1 bg-slate-100 text-slate-500 rounded-md ml-auto border border-slate-200 uppercase">
                  Supplementary
               </span>
@@ -396,29 +382,29 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
             
             {similarityDetail ? (
               <div className="space-y-4">
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Pattern Analysis</div>
-                  <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
+                <div className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 hover:bg-white hover:border-slate-200 hover:shadow-md transition-all duration-300">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>Pattern Analysis</div>
+                  <p className="text-sm font-medium text-slate-800 leading-relaxed whitespace-pre-wrap" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
                     {similarityDetail.interpretation || (similarityDetail.hasSuspiciousPattern ? 'A similarity pattern was detected.' : 'No suspicious similarity pattern was detected.')}
                   </p>
                 </div>
                 {similarityDetail.matches?.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 mt-4">Cross-Report Matches</h4>
+                  <div className="space-y-3 mt-6">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Cross-Report Matches</h4>
                     {similarityDetail.matches.map((match, i) => (
-                      <div key={i} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-slate-300 transition-colors">
-                        <div className="flex items-center justify-between gap-3 mb-2">
-                          <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">{match.trackingCode || match.tracking_code || `Match ${i + 1}`}</h4>
-                          <span className="text-xs font-bold text-slate-500">{match.similarityScore ?? match.score ?? 'N/A'}%</span>
+                      <div key={i} className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 shadow-sm hover:bg-white hover:border-blue-100 hover:shadow-md transition-all duration-300">
+                        <div className="flex items-center justify-between gap-3 mb-3">
+                          <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>{match.trackingCode || match.tracking_code || `Match ${i + 1}`}</h4>
+                          <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">{match.similarityScore ?? match.score ?? 'N/A'}% Match</span>
                         </div>
-                        <p className="text-sm text-slate-700 leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{match.reason || match.observation || 'No description provided.'}</p>
+                        <p className="text-sm font-medium text-slate-700 leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{match.reason || match.observation || 'No description provided.'}</p>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
             ) : (
-              <div className="text-sm text-slate-500 italic font-medium py-3 rounded-lg bg-slate-50 border border-slate-100 px-4 text-center">
+              <div className="text-sm font-bold text-slate-500 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 px-5 text-center shadow-sm">
                 No similarity data was returned.
               </div>
             )}
@@ -428,14 +414,14 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
       </div>
 
       {/* Mandatory Disclaimer Box (Always visible at bottom) */}
-      <div className="p-4 md:p-6 bg-slate-50 border-t border-slate-200 shrink-0 shadow-[0_-10px_40px_-5px_rgba(0,0,0,0.05)] relative z-10">
-        <div className="bg-amber-50 border border-amber-400 rounded-xl max-w-none md:p-5 p-4 shadow-sm relative overflow-hidden">
+      <div className="p-3 md:p-6 bg-slate-50 border-t border-slate-200 shrink-0 shadow-[0_-10px_40px_-5px_rgba(0,0,0,0.05)] relative z-10">
+        <div className="bg-amber-50 border border-amber-400 rounded-xl max-w-none md:p-5 p-3 shadow-sm relative overflow-hidden">
            <div className="absolute top-0 right-0 w-24 h-24 bg-amber-200/30 rounded-full blur-2xl -mr-6 -mt-6"></div>
-           <div className="flex items-center gap-2.5 mb-2.5 text-amber-900 font-black tracking-tight uppercase">
-             <AlertTriangle className="w-6 h-6" />
+           <div className="flex items-center gap-2 md:gap-2.5 mb-1.5 md:mb-2.5 text-amber-900 font-black tracking-tight uppercase text-xs md:text-sm">
+             <AlertTriangle className="w-4 h-4 md:w-6 md:h-6" />
              Advisory
            </div>
-           <p className="text-sm text-amber-900 leading-relaxed font-bold" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
+           <p className="text-xs md:text-sm text-amber-900 leading-relaxed font-bold" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
              {MANDATORY_AI_DISCLAIMER}
            </p>
         </div>

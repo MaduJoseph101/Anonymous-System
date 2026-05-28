@@ -60,8 +60,8 @@ export default function StatusControls({ reportId, currentStatus, onStatusUpdate
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 md:p-6 shadow-sm">
-      <h3 className="font-extrabold text-slate-800 text-base md:text-lg mb-4 md:mb-5 border-b border-slate-100 pb-3">Update Status</h3>
+    <div className="bg-white border-2 border-slate-100 rounded-2xl p-5 md:p-6 shadow-sm">
+      <h3 className="font-black text-slate-800 text-base md:text-lg mb-4 md:mb-5 border-b border-slate-100 pb-3 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-slate-400"></div>Update Status</h3>
       
       {apiError && (
         <div className="bg-red-50 border-l-4 border-l-red-600 border-y border-r border-red-200 rounded-r-lg p-4 mb-6 relative shadow-sm">
@@ -73,7 +73,7 @@ export default function StatusControls({ reportId, currentStatus, onStatusUpdate
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div>
            <select
-            className="w-full px-4 py-3 pr-10 truncate bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-600 outline-none text-sm text-slate-800 font-bold transition-all shadow-sm"
+            className="w-full px-5 py-4 pr-10 truncate bg-slate-50 border-2 border-slate-200 rounded-xl hover:border-slate-300 hover:bg-slate-100/50 focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-slate-800 font-bold transition-all duration-200 shadow-sm"
             {...register('status', { required: true })}
           >
             <option value="">Select next status</option>
@@ -86,15 +86,15 @@ export default function StatusControls({ reportId, currentStatus, onStatusUpdate
         </div>
 
         {requiresCorroboration && (
-          <div className="animate-in fade-in slide-in-from-top-4 p-4 md:p-5 bg-orange-50 border-l-4 border-l-orange-500 border-orange-200 rounded-r-xl rounded-l-sm space-y-4 shadow-sm relative">
+          <div className="animate-in fade-in slide-in-from-top-4 p-5 md:p-6 bg-orange-50/50 border-2 border-orange-200 rounded-2xl space-y-4 shadow-sm relative">
              <div>
-               <label className="block text-sm font-extrabold text-slate-900 mb-2 uppercase tracking-wide">
-                 Corroboration note <span className="text-red-500">*</span>
+               <label className="block text-sm font-black text-slate-900 mb-3 uppercase tracking-wide flex items-center gap-2">
+                 <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>Corroboration note <span className="text-red-500">*</span>
                </label>
                <textarea
-                 rows={5}
+                 rows={4}
                  placeholder="Add the proof that supports this action..."
-                 className={`w-full px-4 py-3 bg-white border rounded-xl focus:ring-2 focus:ring-orange-600 outline-none text-sm resize-none transition-colors shadow-inner ${errors.corroborationNote ? 'border-red-400' : 'border-orange-300'}`}
+                 className={`w-full px-5 py-4 bg-white border-2 rounded-xl focus:ring-4 focus:ring-orange-500/20 outline-none text-sm resize-none transition-all duration-200 shadow-sm ${errors.corroborationNote ? 'border-red-400' : 'border-orange-200 hover:border-orange-300'}`}
                  {...register('corroborationNote')}
                />
                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-3 gap-3">
@@ -112,7 +112,7 @@ export default function StatusControls({ reportId, currentStatus, onStatusUpdate
         <button
           type="submit"
           disabled={isSubmitDisabled}
-          className="w-full bg-slate-800 hover:bg-slate-900 active:scale-[0.98] text-white font-bold py-3.5 rounded-xl disabled:opacity-50 disabled:active:scale-100 transition-all shadow-md text-base tracking-wide"
+          className="w-full bg-slate-800 hover:bg-slate-900 active:scale-[0.98] text-white font-black py-4 rounded-xl disabled:opacity-50 disabled:active:scale-100 transition-all duration-200 shadow-md text-base tracking-wide"
         >
           {loading ? 'Saving...' : 'Save status'}
         </button>
