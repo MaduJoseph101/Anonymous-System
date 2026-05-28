@@ -9,7 +9,7 @@ export default function UncertaintyField({ register }) {
       <input
         type="text"
         id="uncertaintyStatement"
-        className="block w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors"
+        className="block w-full px-5 py-4 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50 focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200"
         placeholder="e.g. I could not clearly hear everything that was said..."
         {...register('uncertaintyStatement')}
       />

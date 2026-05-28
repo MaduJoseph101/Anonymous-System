@@ -26,7 +26,7 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
         <textarea
           id="description"
           rows={8}
-          className={`block w-full px-4 py-3 rounded-xl border resize-none min-h-[160px] sm:min-h-[220px] ${errors.description ? 'border-red-500 ring-1 ring-red-500 bg-red-50/20' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          className={`block w-full px-5 py-4 rounded-xl border-2 resize-none min-h-[160px] sm:min-h-[220px] ${errors.description ? 'border-red-400 focus:border-red-500 ring-4 ring-red-500/20 bg-red-50/30' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50'} focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200`}
           placeholder="Describe what happened, who was involved, and any details you remember..."
           {...register('description', { 
             required: 'Description is required',
@@ -49,7 +49,7 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
         <input
           type="text"
           id="reporterContext"
-          className={`block w-full px-4 py-3 rounded-xl border ${errors.reporterContext ? 'border-red-500 ring-1 ring-red-500 bg-red-50/20' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          className={`block w-full px-5 py-4 rounded-xl border-2 ${errors.reporterContext ? 'border-red-400 focus:border-red-500 ring-4 ring-red-500/20 bg-red-50/30' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50'} focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200`}
           placeholder="e.g. I was walking to class and passed through there..."
           {...register('reporterContext', { required: 'Please explain why you were there' })}
         />
@@ -63,7 +63,7 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
         </label>
         <select
           id="patternObservation"
-          className="block w-full px-4 py-3 pr-10 truncate rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors"
+          className="block w-full px-5 py-4 pr-10 truncate rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50 focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200"
           {...register('patternObservation')}
         >
           <option value="">Select an option</option>
@@ -80,7 +80,7 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
         </label>
         <select
           id="witnessPresence"
-          className={`block w-full px-4 py-3 pr-10 truncate rounded-xl border ${errors.witnessPresence ? 'border-red-500 ring-1 ring-red-500 bg-red-50/20' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          className={`block w-full px-5 py-4 pr-10 truncate rounded-xl border-2 ${errors.witnessPresence ? 'border-red-400 focus:border-red-500 ring-4 ring-red-500/20 bg-red-50/30' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50'} focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200`}
           {...register('witnessPresence', { required: 'Please select an option' })}
         >
           <option value="">Select an option</option>
@@ -98,7 +98,7 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
         </label>
         <select
           id="immediateAction"
-          className={`block w-full px-4 py-3 pr-10 truncate rounded-xl border ${errors.immediateAction ? 'border-red-500 ring-1 ring-red-500 bg-red-50/20' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          className={`block w-full px-5 py-4 pr-10 truncate rounded-xl border-2 ${errors.immediateAction ? 'border-red-400 focus:border-red-500 ring-4 ring-red-500/20 bg-red-50/30' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50'} focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200`}
           {...register('immediateAction', { required: 'Please select an option' })}
         >
           <option value="">Select an option</option>
@@ -118,7 +118,7 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
         </label>
         <select
           id="ongoingStatus"
-          className="block w-full px-4 py-3 pr-10 truncate rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors"
+          className="block w-full px-5 py-4 pr-10 truncate rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50 focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200"
           {...register('ongoingStatus')}
         >
           <option value="">Select an option</option>
@@ -136,7 +136,7 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
           type="file"
           id="media"
           accept="image/*,video/*"
-          className={`block w-full rounded-xl border bg-slate-50 file:mr-4 file:border-0 file:bg-blue-600 file:px-4 file:py-3 file:font-bold file:text-white hover:file:bg-blue-700 ${errors.media ? 'border-red-500 ring-1 ring-red-500 bg-red-50/20' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 transition-colors`}
+          className={`block w-full rounded-xl border-2 bg-slate-50 file:mr-5 file:border-0 file:bg-slate-800 file:px-5 file:py-4 file:font-bold file:text-white hover:file:bg-slate-900 ${errors.media ? 'border-red-400 ring-4 ring-red-500/20 bg-red-50/30' : 'border-slate-200 hover:border-slate-300'} focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200`}
           {...register('media', {
             validate: {
               supportedType: (files) => {

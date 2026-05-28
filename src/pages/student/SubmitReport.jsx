@@ -223,7 +223,7 @@ export default function SubmitReport() {
               <input
                 type="text"
                 id="location"
-                className={`block w-full px-4 py-3 rounded-xl border ${errors.location ? 'border-red-500 ring-1 ring-red-500 bg-red-50/20' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+                className={`block w-full px-5 py-4 rounded-xl border-2 ${errors.location ? 'border-red-400 focus:border-red-500 ring-4 ring-red-500/20 bg-red-50/30' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50'} focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200`}
                 placeholder="e.g. Main Library, Ground Floor"
                 {...register('location', {
                   required: 'Location is required',

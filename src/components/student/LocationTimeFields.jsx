@@ -10,7 +10,7 @@ export default function LocationTimeFields({ register, errors }) {
         <textarea
           id="locationDescription"
           rows={4}
-          className={`block w-full px-4 py-3 rounded-xl border resize-none min-h-[100px] sm:min-h-[120px] ${errors.locationDescription ? 'border-red-500 ring-1 ring-red-500 bg-red-50/20' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          className={`block w-full px-5 py-4 rounded-xl border-2 resize-none min-h-[100px] sm:min-h-[120px] ${errors.locationDescription ? 'border-red-400 focus:border-red-500 ring-4 ring-red-500/20 bg-red-50/30' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50'} focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200`}
           placeholder="e.g. Near the back of the main cafeteria, close to the bins..."
           {...register('locationDescription', { required: 'Please describe the location' })}
         />
@@ -24,7 +24,7 @@ export default function LocationTimeFields({ register, errors }) {
         </label>
         <select
           id="timeOfDay"
-          className={`block w-full px-4 py-3 pr-10 truncate rounded-xl border ${errors.timeOfDay ? 'border-red-500 ring-1 ring-red-500 bg-red-50/20' : 'border-slate-300'} focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 bg-white transition-colors`}
+          className={`block w-full px-5 py-4 pr-10 truncate rounded-xl border-2 ${errors.timeOfDay ? 'border-red-400 focus:border-red-500 ring-4 ring-red-500/20 bg-red-50/30' : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50'} focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 font-medium transition-all duration-200`}
           {...register('timeOfDay', { required: 'Please select an approximate time' })}
         >
           <option value="">Select a time period</option>
