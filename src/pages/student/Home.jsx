@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Eye, CheckCircle, MessageSquare, ChevronDown, ChevronUp, Lock, AlertCircle, Users, AlertTriangle, Menu, X, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { REPORT_CATEGORIES } from '../../utils/constants';
 
 export default function Home() {
@@ -324,15 +324,21 @@ export default function Home() {
                      <ChevronDown className="w-5 h-5 text-slate-400 shrink-0 ml-4" />
                    )}
                  </button>
-                 {openFaq === index && (
-                   <motion.div 
-                     initial={{ opacity: 0, height: 0 }}
-                     animate={{ opacity: 1, height: "auto" }}
-                     className="px-8 pb-6 pt-2 text-slate-600 text-base leading-relaxed bg-slate-50/50 text-balance"
-                   >
-                     {faq.answer}
-                   </motion.div>
-                 )}
+                 <AnimatePresence initial={false}>
+                   {openFaq === index && (
+                     <motion.div 
+                       initial={{ opacity: 0, height: 0 }}
+                       animate={{ opacity: 1, height: "auto" }}
+                       exit={{ opacity: 0, height: 0 }}
+                       transition={{ duration: 0.3, ease: "easeInOut" }}
+                       className="overflow-hidden bg-slate-50/50"
+                     >
+                       <div className="px-8 pb-6 pt-2 text-slate-600 text-base leading-relaxed text-balance">
+                         {faq.answer}
+                       </div>
+                     </motion.div>
+                   )}
+                 </AnimatePresence>
                </div>
             ))}
           </div>

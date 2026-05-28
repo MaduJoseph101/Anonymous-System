@@ -67,10 +67,10 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
           {...register('patternObservation')}
         >
           <option value="">Select an option</option>
-          <option value="Single incident">Single incident</option>
-          <option value="Recurring pattern">Recurring pattern</option>
-          <option value="Similar incidents with same people">Similar incidents with same people</option>
-          <option value="Unsure">Unsure</option>
+          <option value="This is the first time I've seen this">This is the first time I've seen this</option>
+          <option value="This has happened before">This has happened before</option>
+          <option value="I've seen the same people doing this before">I've seen the same people doing this before</option>
+          <option value="I'm not really sure">I'm not really sure</option>
         </select>
       </div>
 
@@ -84,10 +84,10 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
           {...register('witnessPresence', { required: 'Please select an option' })}
         >
           <option value="">Select an option</option>
-          <option value="Yes, others were nearby">Yes, others were nearby</option>
-          <option value="No, just me">No, just me</option>
-          <option value="Unsure">Unsure</option>
-          <option value="Prefer not to say">Prefer not to say</option>
+          <option value="Yes, there were other people around">Yes, there were other people around</option>
+          <option value="No, it was just me">No, it was just me</option>
+          <option value="I couldn't really tell">I couldn't really tell</option>
+          <option value="I'd rather not say">I'd rather not say</option>
         </select>
         {errors.witnessPresence && <p className="mt-2 text-sm text-red-600 font-medium">{errors.witnessPresence.message}</p>}
       </div>
@@ -102,12 +102,12 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
           {...register('immediateAction', { required: 'Please select an option' })}
         >
           <option value="">Select an option</option>
-          <option value="Left the area">Left the area</option>
-          <option value="Stayed to observe">Stayed to observe</option>
-          <option value="Tried to intervene">Tried to intervene</option>
-          <option value="Found a staff member">Found a staff member</option>
-          <option value="Contacted someone else">Contacted someone else</option>
-          <option value="Prefer not to say">Prefer not to say</option>
+          <option value="I left the area right away">I left the area right away</option>
+          <option value="I stayed and watched what was happening">I stayed and watched what was happening</option>
+          <option value="I stepped in and tried to help">I stepped in and tried to help</option>
+          <option value="I went to find a staff member">I went to find a staff member</option>
+          <option value="I called or messaged someone for help">I called or messaged someone for help</option>
+          <option value="I'd rather not say">I'd rather not say</option>
         </select>
         {errors.immediateAction && <p className="mt-2 text-sm text-red-600 font-medium">{errors.immediateAction.message}</p>}
       </div>
@@ -122,9 +122,9 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
           {...register('ongoingStatus')}
         >
           <option value="">Select an option</option>
-          <option value="Yes, currently ongoing">Yes, currently ongoing</option>
-          <option value="No, it has ended">No, it has ended</option>
-          <option value="Unsure">Unsure</option>
+          <option value="Yes, it is still happening right now">Yes, it is still happening right now</option>
+          <option value="No, it has already ended">No, it has already ended</option>
+          <option value="I'm not sure if it's still going on">I'm not sure if it's still going on</option>
         </select>
       </div>
 
