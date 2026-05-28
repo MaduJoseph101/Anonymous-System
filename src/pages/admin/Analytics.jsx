@@ -261,7 +261,7 @@ export default function Analytics() {
                  <div className="flex items-start justify-between gap-3">
                    <div className="min-w-0">
                      <div className="font-black text-slate-800 truncate">{spot.location || 'Unknown location'}</div>
-                     <div className="mt-1 text-xs text-slate-500 font-bold uppercase tracking-wider">{formatCategory(spot.dominantCategory || spot.dominant_category)}</div>
+                     <div className="mt-1 text-[10px] text-slate-500 font-bold uppercase tracking-wider">{formatCategory(spot.dominantCategory || spot.dominant_category)}</div>
                    </div>
                    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black shadow-inner border tracking-wider ${spot.count > 5 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-white border-slate-200 text-slate-700'}`}>
                      {spot.count}

@@ -63,7 +63,12 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                </p>
                
                {reviewPriority && (
-                 <div className="mt-4 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest bg-white text-indigo-700 border border-indigo-200 shadow-sm relative z-10">
+                 <div className={`mt-4 inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest bg-white border shadow-sm relative z-10 ${
+                   reviewPriority?.toUpperCase().includes('HIGH') ? 'text-red-700 border-red-200' : 
+                   reviewPriority?.toUpperCase().includes('MEDIUM') ? 'text-amber-600 border-amber-300' : 
+                   reviewPriority?.toUpperCase().includes('LOW') ? 'text-green-700 border-green-200' : 
+                   'text-indigo-700 border-indigo-200'
+                 }`}>
                    <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Priority: {reviewPriority}
                  </div>
                )}

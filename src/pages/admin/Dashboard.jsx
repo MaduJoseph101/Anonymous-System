@@ -172,7 +172,7 @@ export default function Dashboard() {
             <select 
               value={statusFilter}
               onChange={(e) => updateFilters('status', e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 pr-10 truncate outline-none font-bold whitespace-nowrap min-w-[150px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
+              className="block min-w-[150px] max-w-full px-5 py-3.5 pr-10 truncate rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50 focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 text-sm font-bold outline-none whitespace-nowrap shadow-sm transition-all duration-200 cursor-pointer"
             >
               <option value="">All Statuses</option>
               {Object.keys(STATUS_CONFIG)
@@ -185,7 +185,7 @@ export default function Dashboard() {
             <select 
               value={tierFilter}
               onChange={(e) => updateFilters('tier', e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 pr-10 truncate outline-none font-bold whitespace-nowrap min-w-[150px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
+              className="block min-w-[150px] max-w-full px-5 py-3.5 pr-10 truncate rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50 focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 text-sm font-bold outline-none whitespace-nowrap shadow-sm transition-all duration-200 cursor-pointer"
             >
               <option value="">All Credibility Tiers</option>
               {Object.keys(CREDIBILITY_TIER_CONFIG).map(t => (
@@ -196,7 +196,7 @@ export default function Dashboard() {
             <select 
               value={categoryFilter}
               onChange={(e) => updateFilters('category', e.target.value)}
-              className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-blue-600 focus:bg-white block px-4 py-2.5 pr-10 truncate outline-none font-bold whitespace-nowrap min-w-[200px] max-w-full shadow-sm transition-colors cursor-pointer hover:border-slate-300"
+              className="block min-w-[200px] max-w-full px-5 py-3.5 pr-10 truncate rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100/50 focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-slate-800 text-sm font-bold outline-none whitespace-nowrap shadow-sm transition-all duration-200 cursor-pointer"
             >
               <option value="">All Categories</option>
               {REPORT_CATEGORIES.map(c => (
