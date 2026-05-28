@@ -65,10 +65,10 @@ export default function AdminNavbar() {
             </div>
 
             {/* Desktop Center: Navigation Links */}
-            <div className="flex items-center justify-center gap-2" style={{ width: '33.333333%' }}>
+            <div className="flex items-center justify-center gap-6" style={{ width: '33.333333%' }}>
               <Link 
                 to="/admin/dashboard" 
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${location.pathname.includes('/admin/dashboard') ? 'bg-slate-800 text-white shadow-inner border border-slate-700' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-transparent'}`}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${(location.pathname.includes('/admin/dashboard') || isReportDetailPage) ? 'bg-slate-800 text-white shadow-inner border border-slate-700' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-transparent'}`}
               >
                 <div className="flex items-center gap-1.5">
                   <LayoutDashboard className="w-3.5 h-3.5 shrink-0" />
@@ -144,7 +144,7 @@ export default function AdminNavbar() {
         <div className="flex justify-around items-center h-16 px-2 w-full">
           <Link 
             to="/admin/dashboard" 
-            className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${location.pathname.includes('/admin/dashboard') ? 'text-white' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${(location.pathname.includes('/admin/dashboard') || isReportDetailPage) ? 'text-white' : 'text-slate-400 hover:text-slate-200'}`}
           >
             <LayoutDashboard className="w-4 h-4" />
             <span className="text-[9px] font-bold uppercase tracking-wider">Dashboard</span>

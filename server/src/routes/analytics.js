@@ -12,11 +12,25 @@ router.use(requireRole('SUPER_ADMIN'));
 // GET /api/analytics/overview
 router.get('/overview', async (req, res, next) => {
   try {
-    const days = parseInt(req.query.days) || 30;
-    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    let startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+    let endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+
+    if (!startDate || isNaN(startDate.getTime())) {
+      const days = parseInt(req.query.days) || 30;
+      startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    }
+    if (!endDate || isNaN(endDate.getTime())) {
+      endDate = new Date();
+    }
+    endDate.setHours(23, 59, 59, 999);
+
+    const diffDays = Math.ceil(Math.abs(endDate - startDate) / (1000 * 60 * 60 * 24));
+    if (diffDays > 365) {
+      return res.status(400).json({ success: false, error: "Date range cannot exceed 1 year (365 days)." });
+    }
 
     const where = {
-      created_at: { gte: cutoff },
+      created_at: { gte: startDate, lte: endDate },
       status: { notIn: ['RETRACTED_BY_REPORTER', 'ESCROW'] }
     };
 
@@ -48,7 +62,7 @@ router.get('/overview', async (req, res, next) => {
             DATE(created_at)::text as date,
             COUNT(*)::int as count
           FROM "Report"
-          WHERE created_at >= ${cutoff}
+          WHERE created_at >= ${startDate} AND created_at <= ${endDate}
           AND status NOT IN ('RETRACTED_BY_REPORTER', 'ESCROW')
           GROUP BY DATE(created_at)
           ORDER BY date ASC
@@ -57,7 +71,7 @@ router.get('/overview', async (req, res, next) => {
         prisma.$queryRaw`
           SELECT AVG(EXTRACT(EPOCH FROM (resolved_at - created_at))/3600)::numeric as avg_hours
           FROM "Report"
-          WHERE created_at >= ${cutoff}
+          WHERE created_at >= ${startDate} AND created_at <= ${endDate}
           AND resolved_at IS NOT NULL
         `
       ]);
@@ -84,7 +98,7 @@ router.get('/overview', async (req, res, next) => {
           count: b._count.id
         })),
         dailyTrend,
-        periodDays: days
+        periodDays: diffDays
       }
     });
   } catch (error) {
@@ -95,12 +109,26 @@ router.get('/overview', async (req, res, next) => {
 // GET /api/analytics/hotspots
 router.get('/hotspots', async (req, res, next) => {
   try {
-    const days = parseInt(req.query.days) || 30;
-    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    let startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+    let endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+
+    if (!startDate || isNaN(startDate.getTime())) {
+      const days = parseInt(req.query.days) || 30;
+      startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    }
+    if (!endDate || isNaN(endDate.getTime())) {
+      endDate = new Date();
+    }
+    endDate.setHours(23, 59, 59, 999);
+
+    const diffDays = Math.ceil(Math.abs(endDate - startDate) / (1000 * 60 * 60 * 24));
+    if (diffDays > 365) {
+      return res.status(400).json({ success: false, error: "Date range cannot exceed 1 year (365 days)." });
+    }
 
     const reports = await prisma.report.findMany({
       where: {
-        created_at: { gte: cutoff },
+        created_at: { gte: startDate, lte: endDate },
         status: { notIn: ['RETRACTED_BY_REPORTER', 'ESCROW'] }
       },
       select: {

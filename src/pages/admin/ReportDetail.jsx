@@ -137,7 +137,7 @@ export default function ReportDetail() {
   const isVideo = (item) => getMediaType(item).startsWith('video/');
   
   // Tab classes
-  const tabClass = (tabId) => `px-4 py-3 font-bold text-sm tracking-wide transition-colors border-b-2 whitespace-nowrap ${activeTab === tabId ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`;
+  const tabClass = (tabId) => `flex-1 sm:flex-none px-1 sm:px-8 py-3 font-bold text-sm tracking-tight sm:tracking-wide transition-colors border-b-2 whitespace-nowrap text-center ${activeTab === tabId ? 'border-blue-600 text-blue-700 bg-blue-50/50' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`;
 
   // Panels rendering logic
   const renderDetails = () => (
@@ -508,23 +508,26 @@ export default function ReportDetail() {
     <div className="min-h-screen bg-slate-100 font-sans pb-20">
       <AdminNavbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 mb-4 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8 mb-4 relative z-20 flex justify-start">
         <Link 
           to="/admin/dashboard" 
-          className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors bg-white hover:bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-200 shadow-sm"
+          className="inline-flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors bg-white hover:bg-slate-50 w-10 h-10 rounded-xl border border-slate-200 shadow-sm"
+          title="Back to Dashboard"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+          <ArrowLeft strokeWidth={3} className="w-5 h-5" />
         </Link>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Navigation Tabs */}
-        <div className="flex overflow-x-auto hide-scrollbar border-b border-slate-200 mb-6 bg-white/95 backdrop-blur-sm rounded-t-xl sticky top-0 z-50 shadow-sm">
-          <button onClick={() => setActiveTab('details')} className={tabClass('details')}>Details</button>
-          <button onClick={() => setActiveTab('assessment')} className={tabClass('assessment')}>Assessment</button>
-          <button onClick={() => setActiveTab('messages')} className={tabClass('messages')}>Messages</button>
-          <button onClick={() => setActiveTab('audit')} className={tabClass('audit')}>Audit Log</button>
+        <div className="max-w-5xl mx-auto border-b border-slate-200 mb-6 bg-white/95 backdrop-blur-sm rounded-t-xl sticky top-0 sm:top-16 z-40 shadow-sm transition-all">
+          <div className="flex justify-between sm:justify-center w-full overflow-x-auto hide-scrollbar -mb-px">
+            <button onClick={() => setActiveTab('details')} className={tabClass('details')}>Details</button>
+            <button onClick={() => setActiveTab('assessment')} className={tabClass('assessment')}>Assessment</button>
+            <button onClick={() => setActiveTab('messages')} className={tabClass('messages')}>Messages</button>
+            <button onClick={() => setActiveTab('audit')} className={tabClass('audit')}>Audit Log</button>
+          </div>
         </div>
 
         {/* Unified Tabbed Layout */}

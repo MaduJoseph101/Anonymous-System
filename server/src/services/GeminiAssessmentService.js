@@ -275,7 +275,12 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
           break; // Success, exit retry loop
         } catch (err) {
           console.warn(`[Gemini API] Attempt ${attempt} failed: ${err.message}`);
-          if (attempt === 3) throw new Error(`Gemini API permanently failed after 3 attempts: ${err.message}`);
+          if (attempt === 3) {
+            if (err.message && err.message.includes('429')) {
+               throw new Error("AI analysis is temporarily unavailable because the system has exceeded its API quota limits. Please wait a few moments and try again.");
+            }
+            throw new Error(`Gemini API permanently failed after 3 attempts: ${err.message}`);
+          }
           
           // Exponential backoff: wait 1s, then 2s before retrying
           await new Promise(resolve => setTimeout(resolve, attempt * 1000));

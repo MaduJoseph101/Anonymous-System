@@ -10,20 +10,58 @@ import {
   DailyTrendLine 
 } from '../../components/admin/AnalyticsCharts';
 import { formatCategory } from '../../utils/formatters';
+import ModernDatePicker from '../../components/admin/ModernDatePicker';
 
 export default function Analytics() {
   const [overview, setOverview] = useState(null);
   const [hotspots, setHotspots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [days, setDays] = useState(() => {
-    const saved = localStorage.getItem('asirs_analytics_timeframe');
-    return saved ? parseInt(saved, 10) : 7;
+  const [dateRange, setDateRange] = useState(() => {
+    const saved = localStorage.getItem('asirs_analytics_daterange');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - 30);
+    return {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0]
+    };
   });
 
-  const handleSetDays = (newDays) => {
-    setDays(newDays);
-    localStorage.setItem('asirs_analytics_timeframe', newDays);
+  const handleDateChange = (field, value) => {
+    if (!value) return; // Ignore empty values
+    setDateRange(prev => {
+      const newRange = { ...prev, [field]: value };
+      
+      if (newRange.startDate && newRange.endDate) {
+         const start = new Date(newRange.startDate);
+         const end = new Date(newRange.endDate);
+         
+         if (end < start) {
+            if (field === 'startDate') newRange.endDate = value;
+            else newRange.startDate = value;
+         } else {
+            const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            if (diffDays > 365) {
+               if (field === 'startDate') {
+                  const newEnd = new Date(start);
+                  newEnd.setFullYear(start.getFullYear() + 1);
+                  newRange.endDate = newEnd.toISOString().split('T')[0];
+               } else {
+                  const newStart = new Date(end);
+                  newStart.setFullYear(end.getFullYear() - 1);
+                  newRange.startDate = newStart.toISOString().split('T')[0];
+               }
+            }
+         }
+      }
+      
+      localStorage.setItem('asirs_analytics_daterange', JSON.stringify(newRange));
+      return newRange;
+    });
   };
 
   const fetchData = useCallback(async () => {
@@ -31,8 +69,8 @@ export default function Analytics() {
     setError('');
     try {
       const [overviewRes, hotspotsRes] = await Promise.all([
-        api.analytics.getOverview({ days }),
-        api.analytics.getHotspots({ days })
+        api.analytics.getOverview({ startDate: dateRange.startDate, endDate: dateRange.endDate }),
+        api.analytics.getHotspots({ startDate: dateRange.startDate, endDate: dateRange.endDate })
       ]);
       const overviewPayload = overviewRes?.analytics || overviewRes?.data?.analytics || overviewRes?.data || overviewRes || {};
       const hotspotsPayload = hotspotsRes?.hotspots || hotspotsRes?.data?.hotspots || hotspotsRes?.data || hotspotsRes || [];
@@ -47,18 +85,13 @@ export default function Analytics() {
     } finally {
       setLoading(false);
     }
-  }, [days]);
+
+
+  }, [dateRange]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const timeRanges = [
-    { label: '7 Days', value: 7 },
-    { label: '30 Days', value: 30 },
-    { label: '90 Days', value: 90 },
-    { label: '1 Year', value: 365 }
-  ];
 
   const analyticsData = overview || {};
   const reportsByCategory = analyticsData.reportsByCategory || analyticsData.byCategory || [];
@@ -87,17 +120,35 @@ export default function Analytics() {
             <p className="text-sm text-slate-500 mt-1.5 font-bold">Summary of reports over time.</p>
           </div>
 
-          <div className="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm overflow-x-auto hide-scrollbar shrink-0 w-full md:w-auto">
-            {timeRanges.map(range => (
-              <button
-                key={range.value}
-                type="button"
-                onPointerDown={() => handleSetDays(range.value)}
-                className={`px-4 py-2.5 text-sm font-bold rounded-lg transition-colors duration-150 whitespace-nowrap cursor-pointer border ${days === range.value ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md border-indigo-700' : 'bg-white text-slate-600 border-transparent hover:bg-slate-50'}`}
-              >
-                {range.label}
-              </button>
-            ))}
+          <div className="flex flex-col sm:flex-row bg-white p-1 rounded-xl border border-slate-200 shadow-sm items-center gap-1 shrink-0 w-full md:w-auto hover:border-indigo-300 transition-all duration-300 focus-within:ring-4 focus-within:ring-indigo-50 focus-within:border-indigo-400">
+             <div className="flex flex-col relative px-3 py-1.5 hover:bg-slate-50 rounded-lg transition-colors w-full sm:w-auto">
+               <div className="flex items-center gap-1.5 mb-0.5 pointer-events-none">
+                  <Calendar className="w-3 h-3 text-indigo-500" />
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Start Date</label>
+               </div>
+               <ModernDatePicker 
+                 value={dateRange.startDate} 
+                 maxDate={dateRange.endDate}
+                 onChange={(val) => handleDateChange('startDate', val)}
+                 alignRight={true}
+               />
+             </div>
+             
+             <div className="w-full h-px sm:w-px sm:h-8 bg-slate-200 my-1 sm:my-0 sm:mx-1"></div>
+             
+             <div className="flex flex-col relative px-3 py-1.5 hover:bg-slate-50 rounded-lg transition-colors w-full sm:w-auto">
+               <div className="flex items-center gap-1.5 mb-0.5 pointer-events-none">
+                  <Calendar className="w-3 h-3 text-indigo-500" />
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">End Date</label>
+               </div>
+               <ModernDatePicker 
+                 value={dateRange.endDate} 
+                 minDate={dateRange.startDate}
+                 maxDate={new Date().toISOString().split('T')[0]}
+                 onChange={(val) => handleDateChange('endDate', val)}
+                 alignRight={true}
+               />
+             </div>
           </div>
         </div>
 
@@ -130,7 +181,9 @@ export default function Analytics() {
              <div className="text-indigo-900 text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2 z-10 relative">
                 <Calendar className="w-4 h-4 text-indigo-500" /> Active Frame
              </div>
-             <div className="text-2xl sm:text-3xl font-extrabold text-indigo-700 tracking-tighter relative z-10">Last {days} days</div>
+             <div className="text-xl sm:text-2xl font-extrabold text-indigo-700 tracking-tighter relative z-10 truncate">
+               {new Date(dateRange.startDate).toLocaleDateString(undefined, {month: 'short', day: 'numeric'})} - {new Date(dateRange.endDate).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}
+             </div>
           </div>
         </div>
 
