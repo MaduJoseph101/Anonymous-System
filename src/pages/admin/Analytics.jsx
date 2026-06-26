@@ -7,9 +7,7 @@ import {
   CategoryBarChart, 
   StatusPieChart, 
   TierPieChart, 
-  DailyTrendLine,
-  ForensicsPieChart,
-  FlagsBarChart
+  DailyTrendLine
 } from '../../components/admin/AnalyticsCharts';
 import { formatCategory } from '../../utils/formatters';
 import ModernDatePicker from '../../components/admin/ModernDatePicker';
@@ -102,8 +100,6 @@ export default function Analytics() {
   const dailyTrends = analyticsData.dailyTrends || analyticsData.dailyTrend || [];
 
   // Data for new modules (Fallback to empty arrays if not in API)
-  const forensicsData = analyticsData.forensicsData || [];
-  const structuralFlagsData = analyticsData.structuralFlagsData || [];
   const similarityClusters = analyticsData.similarityClusters || [];
   const adminActivity = analyticsData.adminActivity || [];
 
@@ -207,14 +203,6 @@ export default function Analytics() {
 
            <ChartCard title="AI Tier" loading={loading}>
               <TierPieChart data={reportsByCredibility} />
-           </ChartCard>
-
-           <ChartCard title="Media Forensics" loading={loading}>
-              <ForensicsPieChart data={forensicsData} />
-           </ChartCard>
-
-           <ChartCard title="Structural Flags" loading={loading}>
-              <FlagsBarChart data={structuralFlagsData} />
            </ChartCard>
 
            <ChartCard title="Trends" loading={loading}>
