@@ -209,11 +209,14 @@ export default function TrackReport() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {[
                       { label: 'Location', value: report.location || 'Not provided' },
-                      { label: 'Location note', value: report.locationDescription || 'Not provided' },
+                      { label: 'Location description', value: report.locationDescription || 'Not provided' },
                       { label: 'Time of day', value: report.timeOfDay ? report.timeOfDay.replace(/_/g, ' ') : 'Not provided' },
-                      { label: 'Why there', value: report.reporterContext || 'Not provided' },
-                      { label: 'Uncertainty', value: report.uncertaintyStatement || 'Not provided' },
-                      { label: 'Verification', value: report.verificationMethod || 'Not used' }
+                      { label: 'Why were you there?', value: report.reporterContext || 'Not provided' },
+                      { label: 'Recurring issue?', value: report.patternObservation || 'Not provided' },
+                      { label: 'Other witnesses present?', value: report.witnessPresence || 'Not provided' },
+                      { label: 'Immediate reaction', value: report.immediateAction || 'Not provided' },
+                      { label: 'Still ongoing?', value: report.ongoingStatus || 'Not provided' },
+                      { label: 'Uncertainty / caveats', value: report.uncertaintyStatement || 'Not provided' },
                     ].map((field) => (
                       <div key={field.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">{field.label}</p>
