@@ -314,6 +314,7 @@ router.get('/track/:trackingCode', async (req, res, next) => {
         createdAt: report.created_at,
         updatedAt: report.updated_at,
         resolvedAt: report.resolved_at,
+        outcome: report.outcome,
         evidence: Array.isArray(report.evidence) ? report.evidence.map(item => ({
           id: item.id,
           url: item.file_path,

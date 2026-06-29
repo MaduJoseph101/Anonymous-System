@@ -192,6 +192,30 @@ export default function TrackReport() {
                 </div>
               )}
 
+              {(report.outcome === 'FALSE' || report.outcome === 'UNSUBSTANTIATED') && (
+                <div className={`rounded-2xl shadow-sm border p-6 md:p-8 border-l-4 animate-in fade-in ${
+                  report.outcome === 'FALSE' 
+                    ? 'bg-red-50 border-red-200 border-l-red-500' 
+                    : 'bg-orange-50 border-orange-200 border-l-orange-500'
+                }`}>
+                  <div className="flex gap-4">
+                    <div className="shrink-0 mt-1">
+                      <AlertTriangle className={`w-6 h-6 ${report.outcome === 'FALSE' ? 'text-red-600' : 'text-orange-600'}`} />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <h2 className={`text-lg font-bold ${report.outcome === 'FALSE' ? 'text-red-900' : 'text-orange-900'}`}>
+                        Report Tagged as {report.outcome === 'FALSE' ? 'False' : 'Unsubstantiated'}
+                      </h2>
+                      <p className={`text-sm leading-relaxed ${report.outcome === 'FALSE' ? 'text-red-800' : 'text-orange-800'}`}>
+                        {report.outcome === 'FALSE' 
+                          ? 'This report has been flagged as false following administrative review. Note that submitting false reports violates system policies and damages trust.'
+                          : 'This report has been reviewed but could not be substantiated with the provided information.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="border-b border-slate-100 bg-slate-50 p-5 flex items-center justify-between">
                   <h2 className="text-lg font-bold text-slate-800">Report details</h2>

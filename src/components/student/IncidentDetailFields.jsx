@@ -9,6 +9,7 @@ export default function IncidentDetailFields({ register, errors, watch, setValue
 
   useEffect(() => {
     if (!selectedMedia) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPreviewUrl(null);
       return;
     }

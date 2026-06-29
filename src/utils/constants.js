@@ -65,7 +65,7 @@ export const STATUS_CONFIG = {
   },
   CLOSED: { 
     label: 'Closed', 
-    colour: 'bg-gray-100 text-gray-500',
+    colour: 'bg-red-100 text-red-700',
     description: 'This case has been closed.'
   },
   RETRACTED_BY_REPORTER: { 

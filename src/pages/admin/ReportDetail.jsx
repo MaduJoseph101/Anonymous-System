@@ -410,6 +410,7 @@ export default function ReportDetail() {
         reportId={report.id}
         currentStatus={report.status}
         onStatusUpdated={handleStatusUpdated}
+        outcome={report.outcome}
       />
 
       {/* Outcome Recording Section */}

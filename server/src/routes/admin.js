@@ -401,18 +401,35 @@ router.patch('/reports/:id/status',
       // CORROBORATION DOCTRINE: server-side enforcement
       // This check exists at the API handler level and CANNOT be bypassed
       // from the frontend or through direct API calls
-      if (status === 'ACTION_TAKEN') {
+      if (status === 'ACTION_TAKEN' || status === 'RESOLVED') {
         if (!corroborationNote || 
             corroborationNote.trim().length < 50) {
           return res.status(400).json({
             success: false,
             message: 'Corroboration documentation is required before ' +
-              'initiating formal action. Please document the independent ' +
+              'initiating formal action or resolving the report. Please document the independent ' +
               'evidence that supports this report (minimum 50 characters). ' +
               'This requirement protects individuals from institutional ' +
               'action based solely on an anonymous, unverified report.'
           });
         }
+      }
+
+      // Enforce status transition rules
+      const existingReport = await prisma.report.findUnique({
+        where: { id: req.params.id },
+        select: { status: true }
+      });
+
+      if (!existingReport) {
+        return res.status(404).json({ success: false, message: 'Report not found' });
+      }
+
+      if (status === 'CLOSED' && existingReport.status !== 'RESOLVED') {
+        return res.status(400).json({
+          success: false,
+          message: 'A report cannot be CLOSED unless it has been RESOLVED first.'
+        });
       }
 
       const report = await prisma.report.update({

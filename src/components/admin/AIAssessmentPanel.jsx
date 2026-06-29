@@ -388,20 +388,38 @@ export default function AIAssessmentPanel({ compositeScore, compositeTier, gemin
                     {similarityDetail.interpretation || (similarityDetail.hasSuspiciousPattern ? 'A similarity pattern was detected.' : 'No suspicious similarity pattern was detected.')}
                   </p>
                 </div>
-                {similarityDetail.matches?.length > 0 && (
-                  <div className="space-y-3 mt-6">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Cross-Report Matches</h4>
-                    {similarityDetail.matches.map((match, i) => (
-                      <div key={i} className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 shadow-sm hover:bg-white hover:border-blue-100 hover:shadow-md transition-all duration-300">
-                        <div className="flex items-center justify-between gap-3 mb-3">
-                          <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>{match.trackingCode || match.tracking_code || `Match ${i + 1}`}</h4>
-                          <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">{match.similarityScore ?? match.score ?? 'N/A'}% Match</span>
-                        </div>
-                        <p className="text-sm font-medium text-slate-700 leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>{match.reason || match.observation || 'No description provided.'}</p>
+                {(() => {
+                  const matches = [
+                    ...(similarityDetail.suspiciousReports || []),
+                    ...(similarityDetail.convergentReports || []),
+                    ...(similarityDetail.matches || []) // Fallback just in case
+                  ];
+                  
+                  if (matches.length > 0) {
+                    return (
+                      <div className="space-y-3 mt-6">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Cross-Report Matches</h4>
+                        {matches.map((match, i) => (
+                          <div key={i} className="rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 shadow-sm hover:bg-white hover:border-blue-100 hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center justify-between gap-3 mb-3">
+                              <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                {match.trackingCode || match.tracking_code || `Match ${i + 1}`}
+                              </h4>
+                              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
+                                {match.similarity ?? match.similarityScore ?? match.score ?? 'N/A'}% Match
+                              </span>
+                            </div>
+                            <p className="text-sm font-medium text-slate-700 leading-relaxed" style={{ textAlign: 'justify', textJustify: 'inter-word', wordBreak: 'break-word', hyphens: 'auto' }}>
+                              A similar report with the RTC {match.trackingCode || match.tracking_code} has a similar incident reported.
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             ) : (
               <div className="text-sm font-bold text-slate-500 py-4 rounded-2xl bg-slate-50 border-2 border-slate-100 px-5 text-center shadow-sm">

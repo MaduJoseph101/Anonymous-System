@@ -24,7 +24,7 @@ const STATUS_COLORS = {
   INVESTIGATING: '#c084fc',
   ACTION_TAKEN: '#fb923c',
   RESOLVED: '#4ade80',
-  CLOSED: '#94a3b8',
+  CLOSED: '#ef4444',
   RETRACTED_BY_REPORTER: '#fca5a5'
 };
 
@@ -684,7 +684,7 @@ export const DailyTrendLine = ({ data = [] }) => {
       {activeTag && (() => {
         const latestData = detailedData[detailedData.length - 1];
         const val = latestData ? latestData[activeTag] : 0;
-        const color = activeTag === 'count' ? '#6366f1' : activeTag === 'rollingAvg' ? '#8b5cf6' : '#10b981';
+        const color = activeTag === 'count' ? '#6366f1' : activeTag === 'rollingAvg' ? '#3b82f6' : '#10b981';
         const label = activeTag === 'count' ? 'Daily Count' : activeTag === 'rollingAvg' ? '3-Day Average' : 'Cumulative Total';
         
         return (
@@ -714,7 +714,7 @@ export const DailyTrendLine = ({ data = [] }) => {
             <YAxis yAxisId="right" orientation="right" allowDecimals={false} fontSize={11} tickLine={false} axisLine={false} fontWeight={800} stroke="#10b981" />
             
             {!activeTag && <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} position={{ y: 0 }} />}
-            <Legend content={<CustomLegend formatLabel={(val) => val === 'count' ? 'Daily Count' : val === 'rollingAvg' ? '3-Day Average' : 'Cumulative Total'} colors={{ count: '#6366f1', rollingAvg: '#8b5cf6', cumulative: '#10b981' }} activeTag={activeTag} onActiveTagChange={setActiveTag} />} />
+            <Legend content={<CustomLegend formatLabel={(val) => val === 'count' ? 'Daily Count' : val === 'rollingAvg' ? '3-Day Average' : 'Cumulative Total'} colors={{ count: '#6366f1', rollingAvg: '#3b82f6', cumulative: '#10b981' }} activeTag={activeTag} onActiveTagChange={setActiveTag} />} />
             
             <Area 
               yAxisId="right" 
@@ -748,10 +748,10 @@ export const DailyTrendLine = ({ data = [] }) => {
               type="monotone" 
               name="rollingAvg" 
               dataKey="rollingAvg" 
-              stroke="#4f46e5" 
+              stroke="#3b82f6" 
               strokeWidth={3} 
               dot={false} 
-              activeDot={{ r: 6, fill: '#4f46e5', stroke: '#fff', strokeWidth: 2 }} 
+              activeDot={{ r: 6, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }} 
               style={{
                 transition: 'all 0.3s ease',
                 opacity: (activeTag && activeTag !== 'rollingAvg') ? 0.2 : 1,

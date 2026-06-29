@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { api } from '../../services/api';
 import { CORROBORATION_MIN_LENGTH, STATUS_CONFIG } from '../../utils/constants';
 
-export default function StatusControls({ reportId, currentStatus, onStatusUpdated }) {
+export default function StatusControls({ reportId, currentStatus, onStatusUpdated, outcome }) {
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -14,17 +14,18 @@ export default function StatusControls({ reportId, currentStatus, onStatusUpdate
 
   const getValidTransitions = (status) => {
     switch(status) {
-      case 'RECEIVED': return ['UNDER_REVIEW', 'INVESTIGATING', 'RESOLVED', 'CLOSED'];
+      case 'RECEIVED': return ['UNDER_REVIEW', 'INVESTIGATING', 'RESOLVED'];
       case 'ESCROW': return []; // Released automatically
-      case 'UNDER_REVIEW': return ['INVESTIGATING', 'ACTION_TAKEN', 'RESOLVED', 'CLOSED'];
-      case 'INVESTIGATING': return ['ACTION_TAKEN', 'RESOLVED', 'CLOSED'];
-      case 'ACTION_TAKEN': return ['RESOLVED', 'CLOSED'];
+      case 'UNDER_REVIEW': return ['INVESTIGATING', 'ACTION_TAKEN', 'RESOLVED'];
+      case 'INVESTIGATING': return ['ACTION_TAKEN', 'RESOLVED'];
+      case 'ACTION_TAKEN': return ['RESOLVED'];
+      case 'RESOLVED': return ['CLOSED'];
       default: return []; // terminal states
     }
   };
 
   const validNextStatuses = getValidTransitions(currentStatus);
-  const requiresCorroboration = selectedStatus === 'ACTION_TAKEN';
+  const requiresCorroboration = selectedStatus === 'ACTION_TAKEN' || selectedStatus === 'RESOLVED';
   
   const isSubmitDisabled = loading || !selectedStatus || 
     (requiresCorroboration && corroborationNote.length < CORROBORATION_MIN_LENGTH);
@@ -53,8 +54,18 @@ export default function StatusControls({ reportId, currentStatus, onStatusUpdate
 
   if (validNextStatuses.length === 0) {
     return (
-      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-6 text-center text-sm text-slate-500 font-bold">
-        This report is locked ({STATUS_CONFIG[currentStatus]?.label}). Status cannot be changed.
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 md:p-6 text-center flex flex-col items-center justify-center gap-3">
+        <span className="text-sm text-slate-500 font-bold">This report is locked ({STATUS_CONFIG[currentStatus]?.label}). Status cannot be changed.</span>
+        {outcome && (
+          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border font-bold text-xs uppercase tracking-wider ${
+            outcome === 'FALSE' ? 'bg-red-100 text-red-800 border-red-200' :
+            outcome === 'CORROBORATED' ? 'bg-green-100 text-green-800 border-green-200' :
+            outcome === 'UNSUBSTANTIATED' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+            'bg-slate-100 text-slate-800 border-slate-200'
+          }`}>
+            Outcome: {outcome}
+          </div>
+        )}
       </div>
     );
   }

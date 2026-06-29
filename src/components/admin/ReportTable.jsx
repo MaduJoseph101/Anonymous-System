@@ -10,7 +10,7 @@ const STATUS_HEX_COLORS = {
   INVESTIGATING: '#c084fc',
   ACTION_TAKEN: '#fb923c',
   RESOLVED: '#4ade80',
-  CLOSED: '#94a3b8',
+  CLOSED: '#ef4444',
   RETRACTED_BY_REPORTER: '#fca5a5'
 };
 

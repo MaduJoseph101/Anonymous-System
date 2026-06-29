@@ -15,6 +15,7 @@ const ModernDatePicker = ({ value, onChange, minDate, maxDate, alignRight = fals
   const popupRef = useRef(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentMonth(value ? parseISO(value) : new Date());
   }, [value]);
 
