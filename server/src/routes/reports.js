@@ -127,7 +127,7 @@ router.post('/submit',
           status: requiresEscrow ? 'ESCROW' : 'RECEIVED',
           is_in_escrow: requiresEscrow,
           escrow_release_at: requiresEscrow
-            ? new Date(Date.now() + (process.env.NODE_ENV === 'development' ? 30 * 1000 : 24 * 60 * 60 * 1000)) : null,
+            ? new Date(Date.now() + 10 * 1000) : null,
           is_student_verified: isStudentVerified,
           verification_method: isStudentVerified ? 'EMAIL_OTP' : null,
           ai_analysis_status: 'PENDING'

@@ -162,7 +162,7 @@ class EscrowService {
 setInterval(() => {
   EscrowService.releaseExpiredEscrow();
   EscrowService.remindExpiringEscrow();
-}, 60 * 60 * 1000);
+}, 5 * 1000);
 
 // Also run once at startup to release any that expired during downtime
 EscrowService.releaseExpiredEscrow();
