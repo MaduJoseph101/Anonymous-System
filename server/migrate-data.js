@@ -1,6 +1,6 @@
 const { Client } = require('pg');
 
-async function migrate() {
+async function migrateMessages() {
   console.log('Connecting to databases...');
   
   const local = new Client({
@@ -16,37 +16,24 @@ async function migrate() {
     await local.connect();
     await remote.connect();
 
-    // Ensure remote schema matches local schema by running a simple sync if needed.
-    // However, Prisma db push on Render should have done this. 
-    // Let's just dynamically copy data row by row.
+    console.log('Fetching local messages...');
+    const localMsgsRes = await local.query('SELECT * FROM "Message"');
+    console.log(`Found ${localMsgsRes.rowCount} messages locally.`);
 
-    const tables = ['RTCRegistry', 'Report', 'SimilarityCluster'];
+    if (localMsgsRes.rowCount === 0) return;
 
-    for (const table of tables) {
-      console.log(`Fetching local data for ${table}...`);
-      const { rows } = await local.query(`SELECT * FROM "${table}"`);
-      console.log(`Found ${rows.length} rows in ${table}.`);
-
-      if (rows.length === 0) continue;
-
-      const columns = Object.keys(rows[0]);
-      const colNames = columns.map(c => `"${c}"`).join(', ');
-      
-      const placeholders = columns.map((_, i) => `$${i + 1}`).join(', ');
-      
-      const query = `INSERT INTO "${table}" (${colNames}) VALUES (${placeholders}) ON CONFLICT (id) DO NOTHING`;
-
-      for (const row of rows) {
-        const values = columns.map(c => row[c]);
-        try {
-            await remote.query(query, values);
-        } catch (e) {
-            console.error(`Error inserting into ${table}:`, e.message);
-        }
-      }
+    console.log('Migrating Messages...');
+    let count = 0;
+    for (const msg of localMsgsRes.rows) {
+      await remote.query(
+        `INSERT INTO "Message" (id, report_id, sender_type, content, is_read, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (id) DO NOTHING`,
+        [msg.id, msg.report_id, msg.sender_type, msg.content, msg.is_read, msg.created_at]
+      );
+      count++;
     }
 
-    console.log('Migration complete!');
+    console.log(`Successfully migrated ${count} messages!`);
   } catch (error) {
     console.error('Migration failed:', error);
   } finally {
@@ -55,4 +42,4 @@ async function migrate() {
   }
 }
 
-migrate();
+migrateMessages();
