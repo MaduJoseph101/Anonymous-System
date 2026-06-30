@@ -188,7 +188,7 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
 
   static async assessReport(report) {
     try {
-      const imageEvidence = (report.evidence || []).filter(e => e.file_type.startsWith('image/'));
+      const mediaEvidence = (report.evidence || []).filter(e => e.file_type.startsWith('image/') || e.file_type.startsWith('video/'));
 
       // Prevent hitting daily limits on the free tier during development/testing
       if (process.env.USE_MOCK_AI === 'true') {
@@ -199,8 +199,8 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
         let mockImageAnalysis = [];
         let mockAiDetected = false;
 
-        if (imageEvidence.length > 0) {
-          mockImageAnalysis = imageEvidence.map(ev => {
+        if (mediaEvidence.length > 0) {
+          mockImageAnalysis = mediaEvidence.map(ev => {
             const hasAiFindings = ev.metadataFindings && ev.metadataFindings.length > 0;
             if (hasAiFindings) {
               mockAiDetected = true;
@@ -316,7 +316,7 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
       }
 
       let hasAiFlag = false;
-      for (const img of imageEvidence) {
+      for (const img of mediaEvidence) {
         const baseName = img.file_path.split('/').pop();
         const binFindings = img.metadataFindings || [];
         
