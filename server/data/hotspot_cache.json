@@ -1,0 +1,16 @@
+{
+  "labels": {
+    "the new male hostel | it was in the 2nd floor in room 7 | that's my room and i was sleeping | i was locked in the room and beaten by 3 make students": "New Male Hostel",
+    "school field | close to the stadium seats | i was on my way back from class | i saw some students gathered around a corner sniffing a white-looking substance. i couldn't tell exactly what it was or how it smelt, but i could clearly see what they were doing with it": "School Field",
+    "new male hostel | in room 16, 2nd floor | i'm a room member | there's a leaking pipe in one of our toilets. i don't know how long its been leaking cause it's been leaking, because i recently saw it": "New Male Hostel",
+    "conas building | nas 5 in conas | i was having a tutorial | there was a bomb explosion that destroyed the entire 1st floor of the conas school building, throwing me off from the classroom": "Conas Building",
+    "conas building | nas 2 classroom | i was having a class | i saw a hanging wire i assume to be live dangling from the ceiling": "Conas Building",
+    "new male hostel | it's on the second floor in room 7 | i was passing by cause i stay in the room nearby | i saw a student who was locked in the room and was being bullied and beaten by about 3 male students": "New Male Hostel",
+    "new male hostel | room 16 1st floor | i stay in the room | one of the pipes in our bathroom has been leaking for quite sometime now": "New Male Hostel"
+  },
+  "clusters": {
+    "New Male Hostel": "New Male Hostel",
+    "School Field": "School Field",
+    "Conas Building": "Conas Building"
+  }
+}

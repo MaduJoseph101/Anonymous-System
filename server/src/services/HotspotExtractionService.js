@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const GeminiAssessmentService = require('./GeminiAssessmentService');
 
 const titleCase = (value) => {
@@ -21,6 +23,38 @@ const cleanLabel = (value) => {
 class HotspotExtractionService {
   static cache = new Map();
   static clusterCache = new Map();
+  static cachePath = path.join(__dirname, '../../data/hotspot_cache.json');
+  static cacheLoaded = false;
+
+  static loadCache() {
+    if (this.cacheLoaded) return;
+    try {
+      if (fs.existsSync(this.cachePath)) {
+        const data = JSON.parse(fs.readFileSync(this.cachePath, 'utf8'));
+        this.cache = new Map(Object.entries(data.labels || {}));
+        this.clusterCache = new Map(Object.entries(data.clusters || {}));
+      }
+    } catch (e) {
+      console.error('Failed to load hotspot cache:', e.message);
+    }
+    this.cacheLoaded = true;
+  }
+
+  static saveCache() {
+    try {
+      // Ensure directory exists
+      const dir = path.dirname(this.cachePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      
+      const data = {
+        labels: Object.fromEntries(this.cache),
+        clusters: Object.fromEntries(this.clusterCache)
+      };
+      fs.writeFileSync(this.cachePath, JSON.stringify(data, null, 2));
+    } catch (e) {
+      console.error('Failed to save hotspot cache:', e.message);
+    }
+  }
 
   static getFallbackLabel(report) {
     const candidates = [
@@ -90,6 +124,7 @@ Description: ${report.description || 'Not specified'}
   }
 
   static async extractLabel(report) {
+    this.loadCache();
     const sourceKey = this.getSourceKey(report);
 
     if (!sourceKey) return null;
@@ -101,6 +136,7 @@ Description: ${report.description || 'Not specified'}
     if (process.env.USE_MOCK_AI === 'true' || !process.env.GEMINI_API_KEY) {
       const fallback = this.getFallbackLabel(report);
       this.cache.set(sourceKey, fallback);
+      this.saveCache();
       return fallback;
     }
 
@@ -113,17 +149,20 @@ Description: ${report.description || 'Not specified'}
       const label = rawLabel ? titleCase(rawLabel) : this.getFallbackLabel(report);
 
       this.cache.set(sourceKey, label);
+      this.saveCache();
       return label;
     } catch (error) {
       console.error('Hotspot extraction error:', error.message);
       const fallback = this.getFallbackLabel(report);
       this.cache.set(sourceKey, fallback);
+      this.saveCache();
       return fallback;
     }
   }
 
   static async extractLabelsBatch(reports) {
     if (!reports || reports.length === 0) return [];
+    this.loadCache();
 
     const results = [];
     const uncachedReports = [];
@@ -147,6 +186,8 @@ Description: ${report.description || 'Not specified'}
     });
 
     if (uncachedReports.length === 0) {
+      // Save cache if any mock AI labels were set
+      if (process.env.USE_MOCK_AI === 'true' || !process.env.GEMINI_API_KEY) this.saveCache();
       return results;
     }
 
@@ -202,72 +243,93 @@ ${JSON.stringify(uncachedReports.map(r => ({
       });
     }
 
+    this.saveCache();
     return results;
   }
 
   static async clusterLabels(labels) {
     if (!labels || labels.length === 0) return {};
+    this.loadCache();
     
-    // Default fallback is 1:1 mapping
-    const fallbackMap = {};
-    labels.forEach(l => fallbackMap[l] = l);
+    const result = {};
+    const unclustered = [];
 
-    // Create a deterministic cache key from the unique sorted labels
-    const cacheKey = labels.slice().sort().join('|');
+    // Map any labels already in our cache
+    labels.forEach(l => {
+      if (this.clusterCache.has(l)) {
+        result[l] = this.clusterCache.get(l);
+      } else {
+        unclustered.push(l);
+      }
+    });
 
-    if (this.clusterCache.has(cacheKey)) {
-      return this.clusterCache.get(cacheKey);
+    if (unclustered.length === 0) {
+      return result;
     }
 
     if (process.env.USE_MOCK_AI === 'true' || !process.env.GEMINI_API_KEY) {
-      return fallbackMap;
+      unclustered.forEach(l => {
+        result[l] = l;
+        this.clusterCache.set(l, l);
+      });
+      this.saveCache();
+      return result;
     }
 
-    const prompt = `
-You are given a list of location names extracted from incident reports on a campus.
-Your task is to group synonymous or very similar locations together under a single canonical name.
-For example, "School Field" and "In The School's Field" should both map to "School Field".
-"Main Lib" and "Library" should both map to "Library".
+    const existingCanonical = Array.from(new Set(this.clusterCache.values()));
 
-Return ONLY a valid JSON object mapping the original location name to the canonical name. No markdown, no code blocks, no preamble.
+    const prompt = `
+You are given a list of NEW location names extracted from incident reports on a campus.
+Your task is to group synonymous or very similar locations together under a single canonical name.
+You MUST map a new location to one of the EXISTING canonical names if it's a match, or invent a new canonical name if it's a distinct place.
+
+Return ONLY a valid JSON object mapping the NEW location names to their canonical name. No markdown, no code blocks, no preamble.
 Example:
 {
   "School Field": "School Field",
   "In The School's Field": "School Field"
 }
 
-Locations to group:
-${JSON.stringify(labels, null, 2)}
+EXISTING canonical names (use these if they fit):
+${JSON.stringify(existingCanonical, null, 2)}
+
+NEW Locations to map:
+${JSON.stringify(unclustered, null, 2)}
     `.trim();
 
     try {
       const model = GeminiAssessmentService.getModel();
-      const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      const apiRes = await model.generateContent(prompt);
+      const responseText = apiRes.response.text();
       const parsed = this.parseResponse(responseText);
 
-      // Validate the parsed object is a dictionary of strings to strings
       if (parsed && typeof parsed === 'object') {
-         // Merge with fallback to ensure all labels are represented
-         const finalMap = { ...fallbackMap, ...parsed };
-         this.clusterCache.set(cacheKey, finalMap);
-         return finalMap;
+         unclustered.forEach(l => {
+            const canonical = parsed[l] || l;
+            result[l] = canonical;
+            this.clusterCache.set(l, canonical);
+         });
+         this.saveCache();
+         return result;
       }
-      return fallbackMap;
     } catch (error) {
       console.error('Hotspot clustering error:', error.message);
-      return fallbackMap;
     }
+
+    // Fallback if AI fails or returns invalid JSON
+    unclustered.forEach(l => {
+      result[l] = l;
+      this.clusterCache.set(l, l);
+    });
+    this.saveCache();
+    return result;
   }
 
   static pruneCache(resolvedReports) {
-    const activeKeys = new Set(resolvedReports.map(report => this.getSourceKey(report)).filter(Boolean));
-
-    for (const key of this.cache.keys()) {
-      if (!activeKeys.has(key)) {
-        this.cache.delete(key);
-      }
-    }
+    // Only keeping this method so it doesn't break analytics.js if called
+    // Since we now use a persistent cache, pruning everything we don't currently have active
+    // would mean throwing away AI clusters that we paid for and might need again if similar reports occur!
+    // So we make pruneCache a no-op to preserve our precious cache permanently.
   }
 }
 
