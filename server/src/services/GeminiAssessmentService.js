@@ -35,28 +35,28 @@ class GeminiAssessmentService {
   }
 
   static buildPrompt(report) {
-    const imageEvidence = (report.evidence || []).filter(e => e.file_type.startsWith('image/'));
+    const mediaEvidence = (report.evidence || []).filter(e => e.file_type.startsWith('image/') || e.file_type.startsWith('video/'));
     
     let mediaSection = '';
-    if (imageEvidence && imageEvidence.length > 0) {
+    if (mediaEvidence && mediaEvidence.length > 0) {
       mediaSection = `
-CRITICAL: THE REPORTER HAS SUBMITTED PHOTOS/IMAGES EVIDENCE, WHICH ARE ATTACHED TO THIS REQUEST.
-Your role now includes a visual forensic and correlation analysis of the attached image(s).
-For EACH attached image:
+CRITICAL: THE REPORTER HAS SUBMITTED MEDIA EVIDENCE (PHOTOS/VIDEOS), WHICH ARE ATTACHED TO THIS REQUEST.
+Your role now includes a visual forensic and correlation analysis of the attached media.
+For EACH attached file:
 1. VISUAL FORENSICS & AI DETECTION:
-   - Carefully inspect the image for visual signs of generative AI creation (e.g., warped structures, anatomical errors like impossible fingers/limbs, unnaturally smooth textures, inconsistent lighting, nonsensical text in background signs, uniform digital grain/noise).
+   - Carefully inspect the media for visual signs of generative AI creation (e.g., warped structures, anatomical errors like impossible fingers/limbs, unnaturally smooth textures, inconsistent lighting, nonsensical text in background signs, uniform digital grain/noise, temporal inconsistencies in video).
    - Set "isAiGenerated" to true if you detect clear visual indicators or if the metadata scan findings list strong AI generators.
 2. REPORT CORRELATION ANALYSIS:
-   - Analyse if the image contents correlate with the written report details (e.g. if the report states a fire occurred in the cafeteria, does the image depict the cafeteria or fire/smoke damage? If the image is a generic stock photo of a laptop or a random cat, note that it has a low correlation).
+   - Analyse if the media contents correlate with the written report details (e.g. if the report states a fire occurred in the cafeteria, does the media depict the cafeteria or fire/smoke damage?).
    - Provide a concise but rich analysis explanation under "correlationAnalysis".
 
-ATTACHED IMAGES SUMMARY FOR YOUR FORENSIC REVIEW:`;
-      for (const img of imageEvidence) {
-        const findings = img.metadataFindings || [];
-        const baseName = img.file_path.split('/').pop();
+ATTACHED MEDIA SUMMARY FOR YOUR FORENSIC REVIEW:`;
+      for (const media of mediaEvidence) {
+        const findings = media.metadataFindings || [];
+        const baseName = media.file_path.split('/').pop();
         mediaSection += `
-- Image File: "${baseName}"
-  Mime-Type: ${img.file_type}
+- Media File: "${baseName}"
+  Mime-Type: ${media.file_type}
   Binary Metadata Scan Findings: [${findings.join(', ') || 'No AI signatures detected in binary tags'}]`;
       }
     } else {
@@ -255,12 +255,12 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
       const model = this.getModel();
       const prompt = this.buildPrompt(report);
 
-      const imageParts = [];
-      for (const img of imageEvidence) {
-        const absolutePath = path.join(process.cwd(), img.file_path);
-        const part = this.fileToGenerativePart(absolutePath, img.file_type);
+      const mediaParts = [];
+      for (const media of mediaEvidence) {
+        const absolutePath = path.join(process.cwd(), media.file_path);
+        const part = this.fileToGenerativePart(absolutePath, media.file_type);
         if (part) {
-          imageParts.push(part);
+          mediaParts.push(part);
         }
       }
       
@@ -269,7 +269,7 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
       // Resilient Retry Mechanism (Up to 3 attempts for transient fetch failures)
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          const contentPayload = [prompt, ...imageParts];
+          const contentPayload = [prompt, ...mediaParts];
           const result = await model.generateContent(contentPayload);
           responseText = result.response.text();
           break; // Success, exit retry loop
