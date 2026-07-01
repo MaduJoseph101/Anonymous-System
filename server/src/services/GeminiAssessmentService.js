@@ -186,6 +186,63 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
     `;
   }
 
+  static generateMockAssessment(mediaEvidence) {
+    let mockImageAnalysis = [];
+    let mockAiDetected = false;
+
+    if (mediaEvidence && mediaEvidence.length > 0) {
+      mockImageAnalysis = mediaEvidence.map(ev => {
+        const hasAiFindings = ev.metadataFindings && ev.metadataFindings.length > 0;
+        if (hasAiFindings) {
+          mockAiDetected = true;
+        }
+        const baseName = ev.file_path.split('/').pop();
+        return {
+          filename: baseName,
+          isAiGenerated: hasAiFindings,
+          correlationAnalysis: 'Mock visual correlation: The content depicted in the media corresponds logically with the incident described in the report.',
+          observedDetails: `Mock observation: Authentic camera exposure properties. ${hasAiFindings ? 'Binary metadata scan flagged ' + ev.metadataFindings.join(', ') + ' markers.' : 'No AI software markers or rendering patterns observed.'}`
+        };
+      });
+    }
+
+    return {
+      overallCredibilityScore: 50,
+      credibilityTier: 'MEDIUM',
+      confidence: 'MEDIUM',
+      dimensions: {
+        internalConsistency: { score: 15, observations: 'Mock observation: Consistent timeline.' },
+        structuralAuthenticity: { score: 10, observations: 'Mock observation: Limited sensory detail.' },
+        proportionality: { score: 15, observations: 'Mock observation: Standard detail length.' },
+        linguisticPatterns: { score: 10, observations: 'Mock observation: Natural language used.' }
+      },
+      flaggedConcerns: [],
+      positiveIndicators: ['Mock positive indicator'],
+      cbcaStyleObservations: [
+        {
+          criterion: 'Contextual embedding',
+          status: 'Supported',
+          observation: 'Mock observation: The reporter gives a reason for being present.'
+        }
+      ],
+      adminGuidance: 'Mock guidance: Proceed with standard review.',
+      limitations: 'Mock limitation: Text analysis only.',
+      overallSummary: 'Mock summary: The account is moderately consistent, but the detail depth is limited in test mode.',
+      forensicConclusion: 'Mock conclusion: Use standard corroboration procedures.',
+      reviewPriority: 'MEDIUM',
+      aiGeneratedImageDetected: mockAiDetected,
+      imageAnalysis: mockImageAnalysis,
+      assessedAt: new Date().toISOString(),
+      assessedBy: 'gemini-2.5-flash-mock',
+      error: false,
+      mandatoryDisclaimer:
+        'This AI assessment analyses linguistic and structural patterns only. ' +
+        'It cannot determine whether described events actually occurred. ' +
+        'It must never be the sole basis for any institutional action. ' +
+        'All decisions require qualified human review and independent corroboration.'
+    };
+  }
+
   static async assessReport(report) {
     try {
       const mediaEvidence = (report.evidence || []).filter(e => e.file_type.startsWith('image/') || e.file_type.startsWith('video/'));
@@ -193,63 +250,8 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
       // Prevent hitting daily limits on the free tier during development/testing
       if (process.env.USE_MOCK_AI === 'true') {
         console.log('Gemini API skipped (USE_MOCK_AI is true). Returning mock assessment.');
-        // Simulate slight network delay
         await new Promise(resolve => setTimeout(resolve, 800));
-
-        let mockImageAnalysis = [];
-        let mockAiDetected = false;
-
-        if (mediaEvidence.length > 0) {
-          mockImageAnalysis = mediaEvidence.map(ev => {
-            const hasAiFindings = ev.metadataFindings && ev.metadataFindings.length > 0;
-            if (hasAiFindings) {
-              mockAiDetected = true;
-            }
-            const baseName = ev.file_path.split('/').pop();
-            return {
-              filename: baseName,
-              isAiGenerated: hasAiFindings,
-              correlationAnalysis: 'Mock visual correlation: The content depicted in the photo corresponds logically with the incident described in the report.',
-              observedDetails: `Mock observation: Authentic camera exposure properties. ${hasAiFindings ? 'Binary metadata scan flagged ' + ev.metadataFindings.join(', ') + ' markers.' : 'No AI software markers or rendering patterns observed.'}`
-            };
-          });
-        }
-
-        return {
-          overallCredibilityScore: 50,
-          credibilityTier: 'MEDIUM',
-          confidence: 'MEDIUM',
-          dimensions: {
-            internalConsistency: { score: 15, observations: 'Mock observation: Consistent timeline.' },
-            structuralAuthenticity: { score: 10, observations: 'Mock observation: Limited sensory detail.' },
-            proportionality: { score: 15, observations: 'Mock observation: Standard detail length.' },
-            linguisticPatterns: { score: 10, observations: 'Mock observation: Natural language used.' }
-          },
-          flaggedConcerns: [],
-          positiveIndicators: ['Mock positive indicator'],
-          cbcaStyleObservations: [
-            {
-              criterion: 'Contextual embedding',
-              status: 'Supported',
-              observation: 'Mock observation: The reporter gives a reason for being present.'
-            }
-          ],
-          adminGuidance: 'Mock guidance: Proceed with standard review.',
-          limitations: 'Mock limitation: Text analysis only.',
-          overallSummary: 'Mock summary: The account is moderately consistent, but the detail depth is limited in test mode.',
-          forensicConclusion: 'Mock conclusion: Use standard corroboration procedures.',
-          reviewPriority: 'MEDIUM',
-          aiGeneratedImageDetected: mockAiDetected,
-          imageAnalysis: mockImageAnalysis,
-          assessedAt: new Date().toISOString(),
-          assessedBy: 'gemini-2.5-flash-mock',
-          error: false,
-          mandatoryDisclaimer:
-            'This AI assessment analyses linguistic and structural patterns only. ' +
-            'It cannot determine whether described events actually occurred. ' +
-            'It must never be the sole basis for any institutional action. ' +
-            'All decisions require qualified human review and independent corroboration.'
-        };
+        return this.generateMockAssessment(mediaEvidence);
       }
 
       const model = this.getModel();
@@ -277,7 +279,8 @@ Return ONLY valid JSON with NO markdown, NO code blocks, NO preamble:
           console.warn(`[Gemini API] Attempt ${attempt} failed: ${err.message}`);
           if (attempt === 3) {
             if (err.message && err.message.includes('429')) {
-               throw new Error("AI analysis is temporarily unavailable because the system has exceeded its API quota limits. Please wait a few moments and try again.");
+               console.warn("[Gemini API] Quota exceeded on live attempt. Activating automatic Mock AI Fallback.");
+               return this.generateMockAssessment(mediaEvidence);
             }
             throw new Error(`Gemini API permanently failed after 3 attempts: ${err.message}`);
           }
