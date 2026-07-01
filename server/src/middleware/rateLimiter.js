@@ -3,7 +3,7 @@ const crypto = require('crypto');
 
 const reportSubmissionLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour window
-  max: 5, // 5 submissions per hour
+  max: 500, // 500 submissions per hour for testing
   message: {
     success: false,
     message: 'Too many reports submitted from this connection. ' +
